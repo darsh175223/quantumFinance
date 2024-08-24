@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+}
+
+.App {
+  text-align: center;
+  min-height: 100vh;
+  background-color: #b8aed6;
+  background-image: url('./pics/path-to-your-coin-image.jpg');
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: overlay;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.logo {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 24px;
+  color: #fff;
+  text-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 30px #00f;
+  text-decoration: none;
+
+}
+
+nav {
+  display: flex;
+  align-items: center;
+}
+
+nav a {
+  color: #fff;
+  text-decoration: none;
+  margin-right: 20px;
+}
+
+.sign-in {
+  background-color: #2c2650;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 80px);
+}
+
+.hero-content {
+  background-color: rgba(78, 54, 122, 0.8);
+  padding: 40px;
+  border-radius: 10px;
+  max-width: 500px;
+}
+
+h1 {
+  color: white;
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+p {
+  color: white;
+  margin-bottom: 30px;
+}
+
+.try-free {
+  background-color: #3da5d9;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  font-size: 18px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+}
