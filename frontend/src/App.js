@@ -9,6 +9,9 @@ import TradingSim from './pages/TradingSim';
 import ML_stockPrediction from './pages/ML_stockPrediction';
 import ExpenseTracker from './pages/ExpenseTracker';
 import WE_Assistant from './pages/WE_Assistant';
+import BS_Dash from './pages/BS_Dash';
+import Edu_BS from './pages/Edu_BS';
+import App_BS from './pages/App_BS';
 
 
 function App() {
@@ -52,6 +55,9 @@ function App() {
           <Route path="/ML_stockPrediction" element={<ML_stockPrediction />} />
           <Route path="/ExpenseTracker" element={<ExpenseTracker />} />
           <Route path="/WE_Assistant" element={<WE_Assistant />} />
+          <Route path="/BS_Dash" element={<BS_Dash />} />
+          <Route path="/Edu_BS" element={<Edu_BS />} />
+          <Route path="/App_BS" element={<App_BS />} />
 
         </Routes>
       </main>
