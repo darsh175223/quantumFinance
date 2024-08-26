@@ -12,15 +12,37 @@ function UserDashboard() {
 
   const { username } = location.state || { username: 'User' };
 
-  const calcTotal = () =>{
-    console.log("return", PriceSlice[0])
+  const calcTotal = () => {
     let total = 0;
     for (let i = 0; i < PriceSlice.length; i++) {
-    total += PriceSlice[i];
+      total += parseInt(PriceSlice[i]); // Convert to integer before adding
     }
     return total;
+  };
 
-  }
+  const handleClear = () => {
+    try {
+        const response =  axios.patch('http://localhost:8080/clearPurchase', null, {
+          params: {
+            username: username,
+          
+          },
+        });
+        console.log('CLEAR successful:', response.data);
+        // Update state to reflect the new item added
+      setNameSlice([]);
+      setPriceSlice( []);
+      
+      // Optionally, clear the input fields after adding the item
+      setNewItem("");
+      setNewPrice("");
+  
+        
+      } catch (error) {
+        console.error('Error making the purchase:', error);
+      }   
+    
+  };
 
   // Fetch stock assets (QuantitySlice and NameSlice)
   useEffect(() => {
@@ -139,8 +161,17 @@ function UserDashboard() {
               Add
             </button>
           </div>
+
+          <div>
+              <button onClick={handleClear} style={{ backgroundColor: 'red', color: 'white', border: 'none', padding: '10px 20px', cursor: 'pointer' }}>
+            Clear All Items
+            </button>
+              </div>
+
         </div>
       </div>
+              
+
       <div style={{
         marginTop: '50px',
         backgroundColor: 'white',
