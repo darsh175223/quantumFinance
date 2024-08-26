@@ -43,6 +43,9 @@ function UserDashboard() {
   const handleNavigateToExpenseTracker = () => {
     navigate('/ExpenseTracker', { state: { username } });
   };
+  const handleNavigateToWE_Assistant = () => {
+    navigate('/WE_Assistant', { state: { username } });
+  };
 
   return (
     <div style={dashboardStyle}>
@@ -59,6 +62,9 @@ function UserDashboard() {
         </button>
         <button onClick={handleNavigateToExpenseTracker} style={squareStyle}>
           Expense Tracker
+        </button>
+        <button onClick={handleNavigateToWE_Assistant} style={squareStyle}>
+          Wealth Management Assistant
         </button>
       </div>
     </div>
