@@ -51,7 +51,8 @@ function EDU_BS() {
     marginLeft: '30px',
     position: 'absolute',
     top: '190px',
-    left: '20px',
+    left: '20px'
+    , boxShadow: '0px 8px 8px rgba(0, 0, 0, 0.5)',
   };
 
   const inputStyle = {
@@ -92,7 +93,8 @@ function EDU_BS() {
     left: '450px',
     color: '#c5d1de',
     fontSize: '16px',
-    lineHeight: '1.5',
+    lineHeight: '1.5'
+    , boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)',
   };
 
   return (
@@ -109,13 +111,14 @@ function EDU_BS() {
         borderRadius: '25px',
         position: 'absolute',
         top: '100px',
-        left: '200px',
+        left: '200px'
+        , boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)',
 
         
 
         }}>
-        <h2 style={{ marginTop: '-40px', marginBottom: '-30px', color: 'white', marginLeft: '70px' }}>
-            Apply the Black Scholes Model to Real Stocks!
+        <h2 style={{ marginTop: '-40px', marginBottom: '-30px', color: 'white', marginLeft: '230px' }}>
+            Black Scholes Model
         </h2>
         </div>
         
@@ -191,7 +194,7 @@ function EDU_BS() {
 
       </div>
 
-      <div style={{ color: 'black', position: 'absolute', top: '250px', right: '750px' }}>
+      <div style={{ color: 'black', position: 'absolute', top: '250px', right: '750px', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)', }}>
         <div style={{
           backgroundColor: '#86ff86',
           borderRadius: '5px',
@@ -203,7 +206,7 @@ function EDU_BS() {
         </div>
       </div>
 
-      <div style={{ color: 'black', position: 'absolute', top: '250px', right: '450px' }}>
+      <div style={{ color: 'black', position: 'absolute', top: '250px', right: '450px', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)', }}>
         <div style={{
           backgroundColor: '#ff7e7e',
           borderRadius: '5px',
