@@ -46,6 +46,9 @@ function UserDashboard() {
   const handleNavigateToWE_Assistant = () => {
     navigate('/WE_Assistant', { state: { username } });
   };
+  const handleNavigateToBS_Dash = () => {
+    navigate('/BS_Dash', { state: { username } });
+  };
 
   return (
     <div style={dashboardStyle}>
@@ -65,6 +68,9 @@ function UserDashboard() {
         </button>
         <button onClick={handleNavigateToWE_Assistant} style={squareStyle}>
           Wealth Management Assistant
+        </button>
+        <button onClick={handleNavigateToBS_Dash} style={squareStyle}>
+          Black Scholes Model
         </button>
       </div>
     </div>
