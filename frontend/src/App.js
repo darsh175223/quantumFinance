@@ -7,6 +7,7 @@ import Register from './pages/Register';
 import UserDashboard from './pages/UserDashboard';
 import TradingSim from './pages/TradingSim';
 import ML_stockPrediction from './pages/ML_stockPrediction';
+import ExpenseTracker from './pages/ExpenseTracker';
 
 
 function App() {
@@ -48,6 +49,7 @@ function App() {
           <Route path="/UserDashboard" element={<UserDashboard />} />
           <Route path="/TradingSim" element={<TradingSim />} />
           <Route path="/ML_stockPrediction" element={<ML_stockPrediction />} />
+          <Route path="/ExpenseTracker" element={<ExpenseTracker />} />
 
         </Routes>
       </main>
