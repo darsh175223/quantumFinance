@@ -46,7 +46,7 @@ function UserDashboard() {
 
   return (
     <div style={dashboardStyle}>
-      <h1>______</h1>
+      <h1 style={{marginTop: '-200px'}}>______</h1>
       <h1 style={{ marginTop: '0px', marginBottom: '-30px' }}>Welcome, {username}</h1>
       <h1 style={{ marginBottom: '80px' }}>______</h1>
 
