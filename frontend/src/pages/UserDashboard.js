@@ -40,6 +40,9 @@ function UserDashboard() {
   const handleNavigateToML = () => {
     navigate('/ML_stockPrediction', { state: { username } });
   };
+  const handleNavigateToExpenseTracker = () => {
+    navigate('/ExpenseTracker', { state: { username } });
+  };
 
   return (
     <div style={dashboardStyle}>
@@ -53,6 +56,9 @@ function UserDashboard() {
         </button>
         <button onClick={handleNavigateToML} style={squareStyle}>
           ML Stock Prediction
+        </button>
+        <button onClick={handleNavigateToExpenseTracker} style={squareStyle}>
+          Expense Tracker
         </button>
       </div>
     </div>

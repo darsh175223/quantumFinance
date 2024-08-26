@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	"strconv"
 )
 
 // Function to retrieve all users from the database
@@ -298,6 +299,97 @@ func sendNetworthValue(c *gin.Context) {
 
 
 
+func addPurchase(c *gin.Context) {
+	username, usernameOK := c.GetQuery("username")
+	itemName, itemNameOK := c.GetQuery("itemName")
+	price, quantityOK := c.GetQuery("price")
+	
+	// Check if all required parameters are provided
+	if !usernameOK || !itemNameOK || !quantityOK  {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
+		return
+	}
+
+	quantityInt, err := strconv.Atoi(price)
+        if err != nil {
+                fmt.Println("Error converting string to integer:", err)
+                return
+        }
+
+
+	userHistory, err := setPurchases(db, username, itemName, quantityInt)
+	if err != nil {
+		// If the operation fails, return a 404 Not Found status
+		fmt.Println(err)
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "setCash not excecuted correctly"})
+		return
+	}
+
+	// Return the updated user history as a JSON response with a 200 OK status
+	c.IndentedJSON(http.StatusOK, userHistory)
+}
+
+type purchaseInfo struct {
+	PurchasesSlice  []string `json:"purchasesSlice"`
+	PricesList []int `json:"pricesList"`
+
+}
+
+func sendPurchaseInfo(c *gin.Context) {
+	username, usernameOK := c.GetQuery("username")
+	if !usernameOK   {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
+		return
+	}
+
+
+
+	purchases, prices, err := getPurchases(db, username)
+	if err != nil {
+		// If the operation fails, return a 404 Not Found status
+		fmt.Println(err)
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Purchases couln't be retrieved :("})
+		return
+	}
+
+
+
+	response := purchaseInfo{
+		PurchasesSlice:  purchases,
+		PricesList: prices,
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+
+
+
+
+func clearPurchase(c *gin.Context) {
+	username, usernameOK := c.GetQuery("username")
+	
+	
+	// Check if all required parameters are provided
+	if !usernameOK  {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
+		return
+	}
+
+  
+	currUser, err := clearPurchases(db, username)
+	if err != nil {
+		// If the operation fails, return a 404 Not Found status
+		fmt.Println(err)
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "setCash not excecuted correctly"})
+		return
+	}
+	fmt.Println("Deletion")
+	// Return the updated user history as a JSON response with a 200 OK status
+	c.IndentedJSON(http.StatusOK, currUser)
+}
+
+
 
 
 func main() {
@@ -318,6 +410,10 @@ func main() {
 	router.GET("/getStockAssets", sendStockAssets)
 	router.GET("/getCash", sendCashValue)
 	router.GET("/getNetworth",sendNetworthValue )
+	router.PATCH("/addItem",addPurchase )
+	router.GET("/getPurchases", sendPurchaseInfo)
+	router.PATCH("/clearPurchase", clearPurchase)
+
 
 
 	router.PATCH("/setCash",updateCash )

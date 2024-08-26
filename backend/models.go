@@ -22,6 +22,8 @@ type User struct {
 	StockTrades string `json:"stockTrades"` 
 	Cash   string `json:"cash"`
 	Networth   string `json:"networth"`
+	Purchases   string `json:"purchases"`
+	
 }
 
 // GetUsers retrieves all users from the database
@@ -480,4 +482,108 @@ func calculateNetworth(db *sql.DB, username string) (float64, error) {
 	return networth, nil
 }
 
+// setPurchases adds a new purchase to the purchases column for the given user
+func setPurchases(db *sql.DB, username string, itemName string, quantity int) (*User, error) {
+	// First, retrieve the current purchases value
+	var currentPurchases sql.NullString
+	var updatedUser User
 
+	query := `SELECT purchases FROM books WHERE username = ? LIMIT 1`
+	err := db.QueryRow(query, username).Scan(&currentPurchases)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("user not found")
+		}
+		return nil, fmt.Errorf("failed to retrieve current purchases: %v", err)
+	}
+
+	// Handle NULL value for purchases
+	newPurchase := fmt.Sprintf("(%s, %d)", itemName, quantity)
+	updatedPurchases := currentPurchases.String
+	if updatedPurchases == "" {
+		updatedPurchases = newPurchase
+	} else {
+		updatedPurchases += ";" + newPurchase
+	}
+
+	// Update the purchases value in the database
+	_, err = db.Exec("UPDATE books SET purchases = ? WHERE username = ?", updatedPurchases, username)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update purchases: %v", err)
+	}
+
+	// Retrieve the updated user
+	err = db.QueryRow("SELECT id, name, username, purchases FROM books WHERE username = ?", username).Scan(&updatedUser.ID, &updatedUser.Name, &updatedUser.Username, &updatedUser.Purchases)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving updated user: %v", err)
+	}
+
+	return &updatedUser, nil
+}
+
+// getPurchases retrieves the purchases for a given user by their username and returns the items and quantities as slices
+func getPurchases(db *sql.DB, username string) ([]string, []int, error) {
+	// First, retrieve the current purchases value
+	var currentPurchases sql.NullString
+
+	query := `SELECT purchases FROM books WHERE username = ? LIMIT 1`
+	err := db.QueryRow(query, username).Scan(&currentPurchases)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil, fmt.Errorf("user not found")
+		}
+		return nil, nil, fmt.Errorf("failed to retrieve current purchases: %v", err)
+	}
+
+	// Handle NULL value for purchases
+	if !currentPurchases.Valid || currentPurchases.String == "" {
+		return nil, nil, fmt.Errorf("no purchases found")
+	}
+
+	// Split the purchases string into individual tuples using a semicolon
+	purchases := strings.Split(currentPurchases.String, ";")
+
+	// Initialize slices to hold the items and quantities
+	var items []string
+	var quantities []int
+
+	// Iterate over each purchase tuple and extract the item name and quantity
+	for _, purchase := range purchases {
+		purchase = strings.Trim(purchase, "() ")
+
+		parts := strings.Split(purchase, ",")
+		if len(parts) != 2 {
+			return nil, nil, fmt.Errorf("invalid purchase format: %s", purchase)
+		}
+
+		item := strings.TrimSpace(parts[0])
+		quantity, err := strconv.Atoi(strings.TrimSpace(parts[1]))
+		if err != nil {
+			return nil, nil, fmt.Errorf("invalid quantity in purchase: %v", err)
+		}
+
+		items = append(items, item)
+		quantities = append(quantities, quantity)
+	}
+
+	return items, quantities, nil
+}
+
+// clearPurchases removes all entries in the purchases column for the given username
+func clearPurchases(db *sql.DB, username string) (*User, error) {
+	// Update the purchases column to an empty string for the specified user
+	query := `UPDATE books SET purchases = '' WHERE username = ?`
+	_, err := db.Exec(query, username)
+	if err != nil {
+		return nil, fmt.Errorf("failed to clear purchases: %v", err)
+	}
+
+	// Retrieve the updated user to return
+	var updatedUser User
+	err = db.QueryRow("SELECT id, name, username, purchases FROM books WHERE username = ?", username).Scan(&updatedUser.ID, &updatedUser.Name, &updatedUser.Username, &updatedUser.Purchases)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving updated user: %v", err)
+	}
+
+	return &updatedUser, nil
+}
