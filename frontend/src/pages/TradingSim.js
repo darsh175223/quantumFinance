@@ -397,8 +397,8 @@ function TradingSim() {
                   style={{ padding: '10px', marginBottom: '10px', width: '200px' }}
                 />
                 <div style={{ display: 'flex', gap: '10px' }}>
-                  <button onClick={handleBuyClick} style={{ padding: '10px', fontSize: '16px' }}>Buy</button>
-                  <button onClick={handleSellClick} style={{ padding: '10px', fontSize: '16px' }}>Sell</button>
+                  <button onClick={handleBuyClick} style={{ padding: '10px', fontSize: '16px', backgroundColor:'#65ed55' }}>Buy</button>
+                  <button onClick={handleSellClick} style={{ padding: '10px', fontSize: '16px', backgroundColor:'#f55249' }}>Sell</button>
                 </div>
               </>
             )}
