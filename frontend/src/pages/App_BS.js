@@ -4,9 +4,15 @@ import { jStat } from 'jstat';
 import TradingView from '.././components/TradingViewWidget';
 import topNYSECompanies from '../components/NYSECompanies';
 import { Heatmap } from '.././components/Heatmap';
+import OptionsStrategiesDropdown from '.././components/OptionsStrategiesDropdown';
+
+
+
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 
 
 
@@ -32,6 +38,8 @@ function EDU_BS() {
   const [isPopupOpen, setIsPopupOpen] = useState(false); // State to manage popup visibility
   const [isGreekPopupOpen, setisGreekPopupOpen] = useState(false); // State to manage popup visibility
   const [isStratPopupOpen, setisStratPopupOpen] = useState(false); // State to manage popup visibility
+  const [isBUYtPopupOpen, setisBUYtPopupOpen] = useState(false); // State to manage popup visibility
+
 
   const [impliedVolatility, setimpliedVolatility] = useState(0);
   const [selectedCompany, setSelectedCompany] = useState("");
@@ -252,6 +260,10 @@ const computeImpliedVolatility = (S, C) => {
   const handleStratOpenPopup = () => {
     setisStratPopupOpen(true);
   };
+  const handleBUYOpenPopup = () => {
+    console.log("opening BUY")
+    setisBUYtPopupOpen(true);
+  };
 
   const handleClosePopup = () => {
     setIsPopupOpen(false);
@@ -261,6 +273,9 @@ const computeImpliedVolatility = (S, C) => {
   };
   const handleStratClosePopup = () => {
     setisStratPopupOpen(false);
+  };
+  const handleBUYClosePopup = () => {
+    setisBUYtPopupOpen(false);
   };
 
 
@@ -422,7 +437,7 @@ const computeImpliedVolatility = (S, C) => {
       )
     },
     {
-      title: "Married Put",
+      title: "Married Put(Protective Put)",
       content: (
         <>
           <p style={{color:'black'}}>A married put is like buying insurance for a stock you own. You buy a put option so that if the stock’s price drops, you won’t lose too much money because you can still sell it at a higher price.</p>
@@ -511,16 +526,7 @@ const computeImpliedVolatility = (S, C) => {
         </>
       )
     },
-    {
-      title: "Conversion",
-      content: (
-        <>
-          <p style={{color:'black'}}>A conversion is a strategy to take advantage of price differences in the market. You buy the stock, sell a call option, and buy a put option at the same strike price to lock in a small, risk-free profit.</p>
-          <h4>Example:</h4>
-          <p style={{color:'black'}}>You buy 100 shares of Company XYZ at $50, sell a call option with a strike price of $50, and buy a put option with a strike price of $50. This creates a risk-free position, profiting from mispricing in the market.</p>
-        </>
-      )
-    },
+    
     {
       title: "Reversal",
       content: (
@@ -532,6 +538,43 @@ const computeImpliedVolatility = (S, C) => {
       )
     }
   ];
+  const [selectedComponent, setSelectedComponent] = useState('');
+  const [confirmed, setConfirmed] = useState(false);
+
+  const handleConfirm = () => {
+    if (selectedComponent) {
+      setConfirmed(true);
+    }
+  };
+
+  const renderSelectedComponent = () => {
+    switch (selectedComponent) {
+      // case 'button':
+      //   return <Button>Sample Button</Button>;
+      // case 'progress':
+      //   return <Progress value={66} />;
+      // case 'checkbox':
+      //   return <Checkbox />;
+      // case 'radio':
+      //   return (
+      //     <RadioGroup>
+      //       <RadioGroupItem value="option1" id="option1" />
+      //       <RadioGroupItem value="option2" id="option2" />
+      //     </RadioGroup>
+      //   );
+      default:
+        return null;
+    }
+  };
+
+  if (confirmed) {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold">Selected Component</h2>
+        {renderSelectedComponent()}
+      </div>
+    );
+  }
 
 
   return (
@@ -571,7 +614,7 @@ const computeImpliedVolatility = (S, C) => {
           <label style={{ color: '#c5d1de', fontSize: '30px' }}>Cash:</label>
           <h1 style={{ color: '#c5d1de', fontSize: '30px', marginBottom: '50px' }}>${cash}</h1>
 
-          <button  style={buttonStyle}>Buy Option</button>
+          <button  style={buttonStyle} onClick={handleBUYOpenPopup}>Buy Option</button>
         </div>
 
         <button
@@ -636,7 +679,7 @@ const computeImpliedVolatility = (S, C) => {
             boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)',
           }}
         >
-          <h3 style={{ color: '#2bdb8d', marginLeft: '20px', fontSize: '25px' }}>
+          <h3 style={{ color: '#4caded', marginLeft: '20px', fontSize: '25px' }}>
             Charts
           </h3>
         </button>
@@ -747,6 +790,22 @@ const computeImpliedVolatility = (S, C) => {
               </b>
           </button>
           <TradingView></TradingView>
+        </div>
+      )}
+
+
+    {isBUYtPopupOpen && (
+        <div style={popupStyle}>
+          <button style={closeButtonStyle} onClick={handleBUYClosePopup}>
+            <b>X
+              </b>
+          </button>
+          <h1 style={{color:'black'}}>Automated Option Strategy Builder</h1>
+          <div style={{position:'absolute', left:'550px', top:'120px'}}>
+          <OptionsStrategiesDropdown/>
+
+          </div>
+
         </div>
       )}
 
