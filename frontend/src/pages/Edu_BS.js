@@ -30,6 +30,7 @@ function EDU_BS() {
 
     setCallPrice(call.toFixed(2));
     setPutPrice(put.toFixed(2));
+    
   };
 
   const dashboardStyle = {
