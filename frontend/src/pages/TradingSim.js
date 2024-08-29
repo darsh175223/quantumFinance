@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import topNYSECompanies from '../components/NYSECompanies';
+import TradingView from '.././components/TradingViewWidget';
+
 
 
 function TradingSim() {
@@ -24,6 +26,37 @@ function TradingSim() {
   const [NameSlice, setNameSlice] = useState([""]);
   const [PriceSlice, setPriceSlice] = useState([""]);
   const [CurrentPrice, setCurrPrice] = useState([])
+  const [isPopupOpen, setIsPopupOpen] = useState(false); // State to manage popup visibility
+
+  const handleOpenPopup = () => {
+    setIsPopupOpen(true);
+  };
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+  };
+  const popupStyle = {
+    position: 'absolute',
+    top: '400px',
+    left: '800px',
+    transform: 'translate(-50%, -50%)',
+    backgroundColor: 'white',
+    padding: '20px',
+    borderRadius: '10px',
+    width: '1250px',
+    maxWidth:'1250px',
+    height:'500px',
+    boxShadow: '0px 8px 8px rgba(0, 0, 0, 0.5)',
+  };
+  const closeButtonStyle = {
+    position: 'absolute',
+    top: '-2px',
+    right: '-2px',
+    backgroundColor: 'transparent',
+    color: 'red',
+    border: 'none',
+    fontSize: '30px',
+    cursor: 'pointer',
+  };
 
 
   function truncateMoney(moneyStr) {
@@ -353,7 +386,7 @@ function TradingSim() {
             <h2 style={{ color: 'white' }}>Select a Company:</h2>
             <input
               type="text"
-              placeholder="Search by symbol..."
+              placeholder={selectedCompany}
               value={searchTerm}
               onChange={handleSearchChange}
               style={{ padding: '10px', marginBottom: '20px' }}
@@ -430,7 +463,7 @@ function TradingSim() {
           marginTop: '50px',
           backgroundColor: 'white',
           width: '100%',
-          maxWidth: '1200px',
+          maxWidth: '500px',
           padding: '20px',
           boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
         }}>
@@ -455,6 +488,35 @@ function TradingSim() {
           </table>
         </div>
       </div>
+      <button
+          onClick={handleOpenPopup}
+          style={{
+            backgroundColor: '#22272e',
+            padding: '5px',
+            width: '300px',
+            height: '300px',
+            marginLeft: '300px',
+            display: 'flex',
+            alignItems: 'center',
+            borderRadius: '25px',
+            position: 'absolute',
+            top: '600px',
+            left: '650px',
+            boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          <h3 style={{ color: '#4caded', marginLeft: '100px', fontSize: '25px' }}>
+            Charts
+          </h3>
+        </button>
+        {isPopupOpen && (
+  <div style={popupStyle}>
+    <button style={closeButtonStyle} onClick={handleClosePopup}>
+      <b>X</b>
+    </button>
+    {isPopupOpen && <TradingView />} {/* Ensure TradingView is only rendered when the popup is open */}
+  </div>
+)}
     </div>
   );
 }
