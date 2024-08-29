@@ -4,6 +4,9 @@ import { jStat } from 'jstat';
 import TradingView from '.././components/TradingViewWidget';
 import topNYSECompanies from '../components/NYSECompanies';
 import { Heatmap } from '.././components/Heatmap';
+import  ShowOptions  from '.././components/ShowOptions';
+
+
 import OptionsStrategiesDropdown from '.././components/OptionsStrategiesDropdown';
 
 
@@ -362,6 +365,8 @@ const computeImpliedVolatility = (S, C) => {
     width: '1250px',
     height:'500px',
     boxShadow: '0px 8px 8px rgba(0, 0, 0, 0.5)',
+    zIndex: 1000, // Higher z-index to ensure it's on top
+
   };
 
   const greekPopupStyle = {
@@ -375,6 +380,8 @@ const computeImpliedVolatility = (S, C) => {
     width: '1250px',
     height:'500px',
     boxShadow: '0px 8px 8px rgba(0, 0, 0, 0.5)',
+    zIndex: 1000, // Higher z-index to ensure it's on top
+
   };
 
   const closeButtonStyle = {
@@ -773,6 +780,7 @@ const computeImpliedVolatility = (S, C) => {
 
 
             </div>
+            
 
 
 
@@ -781,7 +789,17 @@ const computeImpliedVolatility = (S, C) => {
         
 
   </div>
+  
 )}
+     {true&&(
+      <div style={{position:'absolute', top:'225px', left:'500px'}}>
+      <ShowOptions/>
+
+      </div>
+
+     )
+
+     }
 
       {isPopupOpen && (
         <div style={popupStyle}>
@@ -792,6 +810,7 @@ const computeImpliedVolatility = (S, C) => {
           <TradingView></TradingView>
         </div>
       )}
+      
 
 
     {isBUYtPopupOpen && (
@@ -836,6 +855,9 @@ const computeImpliedVolatility = (S, C) => {
     </div>
         </div>
       )}
+
+      
+
     </div>
   );
 }
