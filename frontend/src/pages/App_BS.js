@@ -793,7 +793,7 @@ const computeImpliedVolatility = (S, C) => {
 )}
      {true&&(
       <div style={{position:'absolute', top:'225px', left:'500px'}}>
-      <ShowOptions/>
+      <ShowOptions />
 
       </div>
 

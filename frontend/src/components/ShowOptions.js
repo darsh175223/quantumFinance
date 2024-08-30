@@ -9,7 +9,8 @@ const ShowOptions = () => {
   const dropdownRef = useRef(null);
   
   const location = useLocation();
-  const { username } = location.state;  // Getting the username from the state passed through the routing
+  const { username } = location.state || { username: 'User' };
+  console.log("Checking if username is passed in", username);
 
   useEffect(() => {
     const handleMouseLeave = (e) => {
@@ -42,16 +43,62 @@ const ShowOptions = () => {
 
   // Function to format the option string
   const formatOption = (strategy, trade) => {
-    const [symbol, strikePrice, duration] = trade.replace(/[()]/g, '').split(',');
+    console.log("strategy", strategy, "trade", trade);
     let description = '';
 
-    if (strategy === 'CoveredCall') {
-      description = `Covered Call for ${symbol} for strike price of $${strikePrice} with call option lasting ${duration} years`;
-    } else if (strategy === 'MarriedPut') {
-      description = `Married Put for ${symbol} for strike price of $${strikePrice} with put option lasting ${duration} years`;
-    } else {
-      description = `${strategy} for ${symbol} for strike price of $${strikePrice} lasting ${duration} years`;
+
+    if(strategy[0]=='C'||strategy[0]=='M'){
+        const [symbol, strikePrice, duration] = trade.replace(/[()]/g, '').split(',');
+    
+
+        if (strategy === 'CoveredCall') {
+        description = `Covered Call for ${symbol} for strike price of $${strikePrice} with call option lasting ${duration} years`;
+        } else if (strategy === 'MarriedPut') {
+        description = `Married Put for ${symbol} for strike price of $${strikePrice} with put option lasting ${duration} years`;
+        } else {
+        description = `${strategy} for ${symbol} for strike price of $${strikePrice} lasting ${duration} years`;
+        }
+
+    }else if(strategy[0]=='B'&&strategy[1]=='u'){
+        const [symbol, strikePrice, higherStrikePrice, duration] = trade.replace(/[()]/g, '').split(',');
+        description = `${strategy} for ${symbol}: Strike price of bought call is $${strikePrice} and sold call is $${higherStrikePrice} lasting ${duration} years`;
+    }else if(strategy[0]=='B'&&strategy[1]=='e'){
+        const [symbol, strikePrice, higherStrikePrice, duration] = trade.replace(/[()]/g, '').split(',');
+        description = `${strategy} for ${symbol}: Strike price of bought put is $${strikePrice} and sold put is $${higherStrikePrice} lasting ${duration} years`;
+    }else if(strategy[0]=='P'){
+        const [symbol, strikePrice, higherStrikePrice, duration] = trade.replace(/[()]/g, '').split(',');
+        description = `${strategy} for ${symbol}: Strike price of Call is $${strikePrice} and Put is $${higherStrikePrice} lasting ${duration} years`;
     }
+    else if(strategy=='LongStraddle'){
+        const [symbol, strikePrice, higherStrikePrice, duration] = trade.replace(/[()]/g, '').split(',');
+        description = `${strategy} for ${symbol}: ${higherStrikePrice} calls and puts at $${strikePrice} lasting ${duration} years`;
+    }
+    else if(strategy=='LongStrangle'){
+        const [symbol, strikePrice, higherStrikePrice, duration] = trade.replace(/[()]/g, '').split(',');
+        description = `${strategy} for ${symbol}: Calls for $${strikePrice} and Puts at $${higherStrikePrice} lasting ${duration} years`;
+    }else if(strategy=='LongCallButterflySpread'){
+        const [symbol, strikePrice, higherStrikePrice, duration] = trade.replace(/[()]/g, '').split(',');
+        const soldCall = (parseInt(higherStrikePrice)-parseInt(strikePrice))+parseInt(higherStrikePrice);
+        description = `${strategy} for ${symbol}: Bought 2 Calls for $${strikePrice}, sold 2 Calls for $${soldCall} and bought 1 Call at $${higherStrikePrice} for ${duration} years`;
+    }
+    else if(strategy=='IronCondor'){
+        const [symbol, high , low, duration] = trade.replace(/[()]/g, '').split(',');
+        const longCall = (parseInt(high)-parseInt(low))/2+parseInt(high);
+        const shortPut = parseInt(low)-(parseInt(high)-parseInt(low))/2;
+        description = `${strategy} for ${symbol}: Bought Put for $${shortPut} and Call for $${longCall}, sold Put for $${low} and Call for $${high}. Expiry: ${duration} years`;
+    }
+    else if(strategy=='IronButterfly'){
+        const [symbol, strike , range, duration] = trade.replace(/[()]/g, '').split(',');
+        const longCall = parseInt(strike)+(parseInt(range)/2);
+        const shortPut = parseInt(strike)-(parseInt(range)/2);
+        description = `${strategy} for ${symbol}: Sold Put/Call for $${strike}, bought Call for $${longCall}, sold Put for $${shortPut}. Expiry: ${duration} years`;
+    }
+    else if(strategy=='Reversal'){
+        const [symbol, strike , range, duration] = trade.replace(/[()]/g, '').split(',');
+        description = `${strategy} for ${symbol}: Bought Put for $${strike}, sold Call for $${range}. Expiry: ${duration} years`;
+    }
+
+    
 
     return description;
   };
@@ -105,12 +152,13 @@ const ShowOptions = () => {
     padding: '16px',
     backgroundColor: '#1f2937',
     color: '#d1d5db',
-    borderRadius: '4px',
+    borderRadius: '15px',
     transition: 'transform 0.3s',
-    transform: isOpen ? `translateY(${optionstraded.length * 40 - 20}px)` : 'translateY(0)',
+    transform: isOpen ? `translateY(${optionstraded.length * 40 }px)` : 'translateY(0)',
     marginTop: '16px',
     marginLeft: '525px'
   };
+  
 
   return (
     <div style={containerStyle}>

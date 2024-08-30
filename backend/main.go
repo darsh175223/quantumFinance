@@ -481,9 +481,271 @@ func sendOptions(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func addBullCallSpread(c *gin.Context) {
+	username, usernameOK := c.GetQuery("username")
+	symbol, symbolOk := c.GetQuery("symbol")
+	strikePrice, strikePriceOk := c.GetQuery("strikePrice")
+	higherStrikePrice, higherStrikePriceOk :=c.GetQuery("higherStrikePrice")
+	time, timeOk :=c.GetQuery("time")
+
+	
+	fmt.Println(" addBullCallSpread reached here")
+	
+	// Check if all required parameters are provided
+	if !usernameOK || !symbolOk || !strikePriceOk || !higherStrikePriceOk||!timeOk {
+		fmt.Println(!usernameOK,!symbolOk, !strikePriceOk, !higherStrikePriceOk )
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
+		return
+	}
+
+	concatenatedString := ";("+symbol+","+strikePrice+","+higherStrikePrice+","+time+");";
+
+	userHistory, err := updateBullCallSpread(db, username, concatenatedString);
+	if err != nil {
+		// If the operation fails, return a 404 Not Found status
+		fmt.Println(err)
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "addBullCallSpread not excecuted correctly"})
+		return
+	}
+
+	// Return the updated user history as a JSON response with a 200 OK status
+	c.IndentedJSON(http.StatusOK, userHistory)
+}
 
 
+func addBearPutSpread(c *gin.Context) {
+	username, usernameOK := c.GetQuery("username")
+	symbol, symbolOk := c.GetQuery("symbol")
+	strikePrice, strikePriceOk := c.GetQuery("strikePrice")
+	lowerStrikePrice, lowerStrikePriceOk :=c.GetQuery("lowerStrikePrice")
+	time, timeOk :=c.GetQuery("time")
 
+	
+	fmt.Println(" addBullCallSpread reached here")
+	
+	// Check if all required parameters are provided
+	if !usernameOK || !symbolOk || !strikePriceOk || !lowerStrikePriceOk ||!timeOk{
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
+		return
+	}
+
+	concatenatedString := ";("+symbol+","+strikePrice+","+lowerStrikePrice+","+time+");";
+
+	userHistory, err := updateBearPutSpread(db, username, concatenatedString);
+	if err != nil {
+		// If the operation fails, return a 404 Not Found status
+		fmt.Println(err)
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "addBearPutSpread not excecuted correctly"})
+		return
+	}
+
+	// Return the updated user history as a JSON response with a 200 OK status
+	c.IndentedJSON(http.StatusOK, userHistory)
+}
+
+func addProtectiveCollar(c *gin.Context) {
+	username, usernameOK := c.GetQuery("username")
+	symbol, symbolOk := c.GetQuery("symbol")
+	call, strikePriceOk := c.GetQuery("call")
+	put, lowerStrikePriceOk :=c.GetQuery("put")
+	time, timeOk :=c.GetQuery("time")
+
+	
+	
+	fmt.Println(" addBullCallSpread reached here")
+	
+	// Check if all required parameters are provided
+	if !usernameOK || !symbolOk || !strikePriceOk || !lowerStrikePriceOk||!timeOk {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
+		return
+	}
+
+	concatenatedString := ";("+symbol+","+call+","+put+","+time+");";
+
+	userHistory, err := updateProtectiveCollar(db, username, concatenatedString);
+	if err != nil {
+		// If the operation fails, return a 404 Not Found status
+		fmt.Println(err)
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "addProtectiveCollar not excecuted correctly"})
+		return
+	}
+
+	// Return the updated user history as a JSON response with a 200 OK status
+	c.IndentedJSON(http.StatusOK, userHistory)
+}
+
+func addLongStraddle(c *gin.Context) {
+	username, usernameOK := c.GetQuery("username")
+	symbol, symbolOk := c.GetQuery("symbol")
+	call, strikePriceOk := c.GetQuery("call")
+	quantity, lowerStrikePriceOk :=c.GetQuery("quantity")
+	time, timeOk :=c.GetQuery("time")
+
+	
+	
+	
+	// Check if all required parameters are provided
+	if !usernameOK || !symbolOk || !strikePriceOk || !lowerStrikePriceOk||!timeOk {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
+		return
+	}
+
+	concatenatedString := ";("+symbol+","+call+","+quantity+","+time+");";
+
+	userHistory, err := updateLongStraddle(db, username, concatenatedString);
+	if err != nil {
+		// If the operation fails, return a 404 Not Found status
+		fmt.Println(err)
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "addLongStraddle not excecuted correctly"})
+		return
+	}
+
+	// Return the updated user history as a JSON response with a 200 OK status
+	c.IndentedJSON(http.StatusOK, userHistory)
+}
+
+func addLongStrangle(c *gin.Context) {
+	username, usernameOK := c.GetQuery("username")
+	symbol, symbolOk := c.GetQuery("symbol")
+	call, strikePriceOk := c.GetQuery("call")
+	put, lowerStrikePriceOk :=c.GetQuery("put")
+	time, timeOk :=c.GetQuery("time")
+
+	
+	
+	
+	// Check if all required parameters are provided
+	if !usernameOK || !symbolOk || !strikePriceOk || !lowerStrikePriceOk||!timeOk {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
+		return
+	}
+
+	concatenatedString := ";("+symbol+","+call+","+put+","+time+");";
+
+	userHistory, err := updateLongStrangle(db, username, concatenatedString);
+	if err != nil {
+		// If the operation fails, return a 404 Not Found status
+		fmt.Println(err)
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "addLongStraddle not excecuted correctly"})
+		return
+	}
+
+	// Return the updated user history as a JSON response with a 200 OK status
+	c.IndentedJSON(http.StatusOK, userHistory)
+}
+
+func addLongCallButterflySpread(c *gin.Context) {
+	username, usernameOK := c.GetQuery("username")
+	symbol, symbolOk := c.GetQuery("symbol")
+	call, strikePriceOk := c.GetQuery("doubleCall")
+	put, lowerStrikePriceOk :=c.GetQuery("boughtCall")
+	time, timeOk :=c.GetQuery("time")
+	
+	
+	// Check if all required parameters are provided
+	if !usernameOK || !symbolOk || !strikePriceOk || !lowerStrikePriceOk||!timeOk {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
+		return
+	}
+
+	concatenatedString := ";("+symbol+","+call+","+put+","+time+");";
+
+	userHistory, err := updateLongCallButterflySpread(db, username, concatenatedString);
+	if err != nil {
+		// If the operation fails, return a 404 Not Found status
+		fmt.Println(err)
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "addLongStraddle not excecuted correctly"})
+		return
+	}
+
+	// Return the updated user history as a JSON response with a 200 OK status
+	c.IndentedJSON(http.StatusOK, userHistory)
+}
+
+
+func addIronCondor(c *gin.Context) {
+	username, usernameOK := c.GetQuery("username")
+	symbol, symbolOk := c.GetQuery("symbol")
+	call, strikePriceOk := c.GetQuery("high")
+	put, lowerStrikePriceOk :=c.GetQuery("low")
+	time, timeOk :=c.GetQuery("time")
+	
+	
+	// Check if all required parameters are provided
+	if !usernameOK || !symbolOk || !strikePriceOk || !lowerStrikePriceOk||!timeOk {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
+		return
+	}
+
+	concatenatedString := ";("+symbol+","+call+","+put+","+time+");";
+
+	userHistory, err := updateIronCondor(db, username, concatenatedString);
+	if err != nil {
+		// If the operation fails, return a 404 Not Found status
+		fmt.Println(err)
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "addLongStraddle not excecuted correctly"})
+		return
+	}
+
+	// Return the updated user history as a JSON response with a 200 OK status
+	c.IndentedJSON(http.StatusOK, userHistory)
+}
+
+func addIronButterfly(c *gin.Context) {
+	username, usernameOK := c.GetQuery("username")
+	symbol, symbolOk := c.GetQuery("symbol")
+	call, strikePriceOk := c.GetQuery("strike")
+	put, lowerStrikePriceOk :=c.GetQuery("range")
+	time, timeOk :=c.GetQuery("time")
+	
+	
+	// Check if all required parameters are provided
+	if !usernameOK || !symbolOk || !strikePriceOk || !lowerStrikePriceOk||!timeOk {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
+		return
+	}
+
+	concatenatedString := ";("+symbol+","+call+","+put+","+time+");";
+
+	userHistory, err := updateIronButterfly(db, username, concatenatedString);
+	if err != nil {
+		// If the operation fails, return a 404 Not Found status
+		fmt.Println(err)
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "addLongStraddle not excecuted correctly"})
+		return
+	}
+
+	// Return the updated user history as a JSON response with a 200 OK status
+	c.IndentedJSON(http.StatusOK, userHistory)
+}
+
+func addReversal(c *gin.Context) {
+	username, usernameOK := c.GetQuery("username")
+	symbol, symbolOk := c.GetQuery("symbol")
+	call, strikePriceOk := c.GetQuery("call")
+	put, lowerStrikePriceOk :=c.GetQuery("put")
+	time, timeOk :=c.GetQuery("time")
+	
+	
+	// Check if all required parameters are provided
+	if !usernameOK || !symbolOk || !strikePriceOk || !lowerStrikePriceOk||!timeOk {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
+		return
+	}
+
+	concatenatedString := ";("+symbol+","+call+","+put+","+time+");";
+
+	userHistory, err := updateReversal(db, username, concatenatedString);
+	if err != nil {
+		// If the operation fails, return a 404 Not Found status
+		fmt.Println(err)
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "addLongStraddle not excecuted correctly"})
+		return
+	}
+
+	// Return the updated user history as a JSON response with a 200 OK status
+	c.IndentedJSON(http.StatusOK, userHistory)
+}
 
 func main() {
 	// Initialize the database connection
@@ -509,6 +771,22 @@ func main() {
 
 	router.PATCH("/addCoveredCall", addCoveredCall)
 	router.PATCH("/addMarriedPut", addMarriedPut)
+	router.PATCH("/addBullCallSpread", addBullCallSpread)
+	router.PATCH("/addBearPutSpread", addBearPutSpread)
+	router.PATCH("/addProtectiveCollar", addProtectiveCollar)
+	router.PATCH("/addLongStraddle", addLongStraddle)
+	router.PATCH("/addLongStrangle", addLongStrangle)
+	router.PATCH("/addLongCallButterflySpread", addLongCallButterflySpread)
+	router.PATCH("/addIronCondor", addIronCondor)
+	router.PATCH("/addIronButterfly", addIronButterfly)
+	router.PATCH("/addReversal", addReversal)
+
+
+
+
+
+
+
 
 
 	router.GET("/getAllOptions", sendOptions)

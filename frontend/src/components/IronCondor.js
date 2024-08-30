@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import topNYSECompanies from '../components/NYSECompanies';
-
+import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 const CoveredCall = () => {
   const [stockPrice, setStockPrice] = useState('');
@@ -10,8 +11,9 @@ const CoveredCall = () => {
   const [companyName, setCompanyName] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("");
 
-  const standardPremium = 10;
-
+  const [time, setTime] = useState("");
+  const location = useLocation();
+  const { username } = location.state || { username: 'User' };
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -40,6 +42,30 @@ const CoveredCall = () => {
   };
     
 
+  const sendCoveredCall = async () => {
+    try {
+      const response = await axios.patch('http://localhost:8080/addIronCondor',null, {
+        params: {
+          username: username,  // replace 'yourUsername' with the actual username
+          symbol: selectedCompany,
+          high:  stockPrice,
+          low: strikePrice,  
+          time: time, 
+        }
+      });
+
+      if (response.status === 200) {
+        console.log('Covered call added successfully:', response.data);
+        // Handle success (e.g., show a success message, update UI, etc.)
+      } else {
+        console.error('Error adding covered call:', response.data);
+        // Handle error (e.g., show an error message)
+      }
+    } catch (error) {
+      console.error('Error sending request:', error);
+      // Handle error (e.g., show an error message)
+    }
+  };
    
   
 
@@ -48,7 +74,7 @@ const CoveredCall = () => {
                     <div>
                     <h1 style={{marginRight:'-500px'}}>Iron Condor Strategy</h1>
                     <div style={{backgroundColor:'#22272e'}}>
-                    <h5 style={{position:'absolute', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)',left:'40px', borderRadius:'15px',  top:'300px', color:'#c5d1de', backgroundColor:'#22272e', padding:'15px', width:'650px'}}>Profit: (Current Price - Strike Price of Bought Call 1) - (Current Price - Strike Price of Sold Call) + (Strike Price of Bought Put - Current Price) - (Strike Price of Sold Put - Current Price) - Net Premium Paid
+                    <h5 style={{position:'absolute', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)',left:'40px', borderRadius:'15px',  top:'320px', color:'#c5d1de', backgroundColor:'#22272e', padding:'15px', width:'650px'}}>Profit: (Current Price - Strike Price of Bought Call 1) - (Current Price - Strike Price of Sold Call) + (Strike Price of Bought Put - Current Price) - (Strike Price of Sold Put - Current Price) - Net Premium Paid
                     </h5>
 
                     </div>
@@ -92,26 +118,35 @@ const CoveredCall = () => {
 
 
                 <div>
-                <h4>Enter strike price of Call</h4>
+                <h4>Enter predicted price range(high)</h4>
                 <input 
                     type="number" 
-                    placeholder="Call Price..." 
+                    placeholder="Price interval..." 
                     value={stockPrice} 
                     style={{ borderColor: 'black'}}
                     onChange={(e) => setStockPrice(e.target.value)} 
                 />
-                        <h4>Enter strike price of Put</h4>
+                        <h4>Enter predicted price range(low)</h4>
 
                 <input 
                     type="number" 
-                    placeholder="Put price..." 
+                    placeholder="Price interval..." 
                     value={strikePrice} 
                     style={{ borderColor: 'black'}}
                     onChange={(e) => setStrikePrice(e.target.value)} 
                 />
+                 <h4>Enter time to expiry(yrs)</h4>
+
+<input 
+    type="number" 
+    placeholder="time..." 
+    value={time} 
+    style={{ borderColor: 'black'}}
+    onChange={(e) => setTime(e.target.value)} 
+/>
                 {/* The Premium input is removed, using $10 as the standard premium */}
                 <div>
-                <button  style={{ padding: '10px', fontSize: '16px', backgroundColor:'#65ed55', borderRadius:'15px', marginTop:'20px' }}>Submit</button>
+                <button  onClick={sendCoveredCall} style={{ padding: '10px', fontSize: '16px', backgroundColor:'#65ed55', borderRadius:'15px', marginTop:'20px' }}>Submit</button>
 
                 </div>
 
