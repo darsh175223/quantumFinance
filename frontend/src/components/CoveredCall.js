@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import topNYSECompanies from '../components/NYSECompanies';
+import { useLocation } from 'react-router-dom';
+import axios from 'axios';
+
+
 
 
 const CoveredCall = () => {
@@ -9,6 +13,10 @@ const CoveredCall = () => {
   const [filteredCompanies, setFilteredCompanies] = useState(topNYSECompanies);
   const [companyName, setCompanyName] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("");
+ 
+  const location = useLocation();
+  const { username } = location.state || { username: 'User' };
+
 
   const standardPremium = 10;
 
@@ -39,7 +47,29 @@ const CoveredCall = () => {
     setCompanyName(company ? company.name : '');
   };
     
+  const sendCoveredCall = async () => {
+    try {
+      const response = await axios.patch('http://localhost:8080/addCoveredCall',null, {
+        params: {
+          username: username,  // replace 'yourUsername' with the actual username
+          symbol: selectedCompany,
+          strikePrice:  stockPrice,
+          time: strikePrice,  // assuming stockPrice is the time to expiry
+        }
+      });
 
+      if (response.status === 200) {
+        console.log('Covered call added successfully:', response.data);
+        // Handle success (e.g., show a success message, update UI, etc.)
+      } else {
+        console.error('Error adding covered call:', response.data);
+        // Handle error (e.g., show an error message)
+      }
+    } catch (error) {
+      console.error('Error sending request:', error);
+      // Handle error (e.g., show an error message)
+    }
+  };
    
   
 
@@ -103,9 +133,8 @@ const CoveredCall = () => {
                     style={{ borderColor: 'black'}}
                     onChange={(e) => setStrikePrice(e.target.value)} 
                 />
-                {/* The Premium input is removed, using $10 as the standard premium */}
                 <div>
-                <button  style={{ padding: '10px', fontSize: '16px', backgroundColor:'#65ed55', borderRadius:'15px', marginTop:'20px' }}>Submit</button>
+                <button onClick={sendCoveredCall} style={{ padding: '10px', fontSize: '16px', backgroundColor:'#65ed55', borderRadius:'15px', marginTop:'20px' }}>Submit</button>
 
                 </div>
 
