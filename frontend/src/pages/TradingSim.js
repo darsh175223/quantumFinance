@@ -88,6 +88,9 @@ function TradingSim() {
   // Fetch the stock price when a company is selected
   useEffect(() => {
     const fetchStockPrice = async () => {
+
+
+
       if (selectedCompany === "") return;
 
 

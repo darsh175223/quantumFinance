@@ -394,17 +394,18 @@ func addCoveredCall(c *gin.Context) {
 	username, usernameOK := c.GetQuery("username")
 	symbol, symbolOk := c.GetQuery("symbol")
 	strikePrice, strikePriceOk := c.GetQuery("strikePrice")
+	basePrice, basePriceOk:=c.GetQuery("basePrice")
 	time, timeOk :=c.GetQuery("time")
 	
 	fmt.Println("reached here")
 	
 	// Check if all required parameters are provided
-	if !usernameOK || !symbolOk || !strikePriceOk || !timeOk {
+	if !usernameOK || !symbolOk || !strikePriceOk || !timeOk||!basePriceOk {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
 		return
 	}
 
-	concatenatedString := ";("+symbol+","+strikePrice+","+time+");";
+	concatenatedString := ";("+symbol+","+strikePrice+","+basePrice+","+time+");";
 
 	userHistory, err := updateCoveredCall(db, username, concatenatedString);
 	if err != nil {
@@ -422,17 +423,19 @@ func addMarriedPut(c *gin.Context) {
 	username, usernameOK := c.GetQuery("username")
 	symbol, symbolOk := c.GetQuery("symbol")
 	strikePrice, strikePriceOk := c.GetQuery("strikePrice")
+	basePrice, basePriceOk:=c.GetQuery("basePrice")
 	time, timeOk :=c.GetQuery("time")
 	
 	fmt.Println("reached here")
 	
 	// Check if all required parameters are provided
-	if !usernameOK || !symbolOk || !strikePriceOk || !timeOk {
+	if !usernameOK || !symbolOk || !strikePriceOk || !timeOk||!basePriceOk {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
 		return
 	}
 
-	concatenatedString := ";("+symbol+","+strikePrice+","+time+");";
+	concatenatedString := ";("+symbol+","+strikePrice+","+basePrice+","+time+");";
+	fmt.Println(concatenatedString)
 
 	userHistory, err := updateMarriedPut(db, username, concatenatedString);
 	if err != nil {
@@ -447,39 +450,7 @@ func addMarriedPut(c *gin.Context) {
 }
 
 
-type SendOptions struct {
-	Options  []string `json:"options"`
-	
 
-}
-
-func sendOptions(c *gin.Context) {
-	username, usernameOK := c.GetQuery("username")
-	if !usernameOK   {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
-		return
-	}
-
-
-
-	optionsList, err := getNonNullColumns(db, username)
-	fmt.Println("optionsList: ",optionsList)
-	if err != nil {
-		// If the operation fails, return a 404 Not Found status
-		fmt.Println(err)
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Stock not removed"})
-		return
-	}
-
-
-
-	response := SendOptions{
-		Options:  optionsList,
-	
-	}
-
-	c.JSON(http.StatusOK, response)
-}
 
 func addBullCallSpread(c *gin.Context) {
 	username, usernameOK := c.GetQuery("username")
@@ -511,7 +482,6 @@ func addBullCallSpread(c *gin.Context) {
 	// Return the updated user history as a JSON response with a 200 OK status
 	c.IndentedJSON(http.StatusOK, userHistory)
 }
-
 
 func addBearPutSpread(c *gin.Context) {
 	username, usernameOK := c.GetQuery("username")
@@ -662,7 +632,6 @@ func addLongCallButterflySpread(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, userHistory)
 }
 
-
 func addIronCondor(c *gin.Context) {
 	username, usernameOK := c.GetQuery("username")
 	symbol, symbolOk := c.GetQuery("symbol")
@@ -747,6 +716,66 @@ func addReversal(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, userHistory)
 }
 
+type SendOptions struct {
+	Options  []string `json:"options"`
+}
+
+func sendOptions(c *gin.Context) {
+	username, usernameOK := c.GetQuery("username")
+	if !usernameOK   {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
+		return
+	}
+
+
+
+	optionsList, err := getNonNullColumns(db, username)
+	fmt.Println("optionsList: ",optionsList)
+	if err != nil {
+		// If the operation fails, return a 404 Not Found status
+		fmt.Println(err)
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Stock not removed"})
+		return
+	}
+
+
+
+	response := SendOptions{
+		Options:  optionsList,
+	
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+func sendProfit(c *gin.Context) {
+	username, usernameOK := c.GetQuery("username")
+	if !usernameOK   {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
+		return
+	}
+
+
+
+	profit, err := returnProfit(db, username)
+	if err != nil {
+		// If the operation fails, return a 404 Not Found status
+		fmt.Println(err)
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Stock not removed"})
+		return
+	}
+	// fmt.Println("optionsList: ",profit)
+
+
+
+	// response := SendOptions{
+	// 	Options:  optionsList,
+	
+	// }
+
+	c.JSON(http.StatusOK, profit)
+}
+
 func main() {
 	// Initialize the database connection
 	ConnectDatabase()
@@ -782,6 +811,7 @@ func main() {
 	router.PATCH("/addReversal", addReversal)
 
 
+	router.GET("/sendProfit", sendProfit)
 
 
 
