@@ -2,11 +2,20 @@ package main
 
 import (
 	"database/sql"
-    "fmt"
+	"fmt"
+	"strings"
+
 	// "strings"
 
-    _ "github.com/go-sql-driver/mysql"
-    // "log"
+	_ "github.com/go-sql-driver/mysql"
+	// "log"
+	// "encoding/json"
+	"errors"
+	// "io/ioutil"
+	// "net/http"
+	"strconv"
+	"math"
+	"regexp"
 )
 
 
@@ -383,7 +392,258 @@ func updateReversal(db *sql.DB, username string, newCoveredCall string) (string,
     return updatedCoveredCall, nil
 }
 
+func returnProfit(db *sql.DB, username string) (int, error) {
+    profit := 0
+    optionsList, err := getNonNullColumns(db, username)
+    // fmt.Println("optionsList: ", optionsList)
+    if err != nil {
+        // If the operation fails, return a 404 Not Found status
+        fmt.Println(err)
+        return 0, err
+    }
 
+    // Iterate through the optionsList
+    for _, option := range optionsList {
+        // Print each option
+        fmt.Println( option, strings.Contains(option, "CoveredCall"))
+
+		if(strings.Contains(option, "CoveredCall")){
+			p, err := coveredCallProfit(db, option)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			profit = profit+p
+
+		}else if(strings.Contains(option, "MarriedPut")){
+			p, err := marriedPutProfit(db, option)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			profit = profit+p
+
+		}else if(strings.Contains(option, "BullCallSpread")){
+			p, err := bullCallSpreadProfit(db, option)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			profit = profit+p
+
+		}else if(strings.Contains(option, "BearPutSpread")){
+			p, err := bearPutSpreadProfit(db, option)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			profit = profit+p
+
+		}else if(strings.Contains(option, "ProtectiveCollar")){
+			p, err := protectiveCollarProfit(db, option)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			profit = profit+p
+
+		}else if(strings.Contains(option, "LongStraddle")){
+			p, err := longStraddleProfit(db, option)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			profit = profit+p
+
+		}else if(strings.Contains(option, "LongStrangle")){
+			p, err := longStrangleProfit(db, option)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			profit = profit+p
+
+		}else if(strings.Contains(option, "LongCallButterflySpread")){
+			p, err := longCallButterflySpreadProfit(db, option)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			profit = profit+p
+
+		}else if(strings.Contains(option, "IronCondor")){
+			p, err := ironCondorProfit(db, option)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			profit = profit+p
+
+		}else if(strings.Contains(option, "IronButterfly")){
+			p, err := ironButterflyProfit(db, option)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			profit = profit+p
+
+		}else if(strings.Contains(option, "Reversal")){
+			p, err := reversalProfit(db, option)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			profit = profit+p
+
+		}
+
+    }
+
+    return profit, nil
+}
+//username == StockName
+func coveredCallProfit(db *sql.DB, coveredCallString string) (int, error) {
+		// Implementation for covered call profit calculation
+		re := regexp.MustCompile(`\(([^()]*)\)`)
+
+        // Find all matches and extract the captured groups
+        matches := re.FindAllStringSubmatch(coveredCallString, -1)
+
+		
+
+        // Create a string slice from the captured groups
+        stringSlice := make([]string, len(matches))
+        for i, match := range matches {
+                stringSlice[i] = match[1]
+        }
+		// fmt.Println(stringSlice[0])
+		profit:=0
+
+		for _, element := range stringSlice {
+			parts := strings.Split(element, ",")
+		symbol := parts[0]
+		fmt.Println(symbol)
+        strikePrice, err := strconv.Atoi(parts[1])
+		if err!=nil{
+			return  0, fmt.Errorf("invalid price format: %w", err)
+
+		}
+		pastPrice, err := strconv.ParseFloat(parts[2], 64)
+        if err != nil {
+                return 0, fmt.Errorf("invalid quantity format: %w", err)
+        }
+		time, err := strconv.ParseFloat(parts[3], 64)
+        if err != nil {
+                return 0, fmt.Errorf("invalid quantity format: %w", err)
+        }
+		currPrice, err:=getCurrentPrice(symbol)
+		if (err!=nil){
+			fmt.Println("Error", err)
+		}
+		pastPriceFloat := float64(pastPrice)
+		currentPriceFloat := float64(currPrice)
+		timeFloat := float64(time)
+		// func premium(currentPrice, strikePrice int, timeToExpiry float64, isCall bool) (int, error) {
+		if(currPrice<=float64(strikePrice)){
+		
+			fmt.Println("pastPriceFloat", pastPriceFloat, " currentPriceFloat", currentPriceFloat, " timeFloat", timeFloat)
+			premiumPrice, err := premium(currentPriceFloat, pastPriceFloat, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			fmt.Println("1premiumPrice", premiumPrice)
+			profit = int(currPrice)-int(pastPrice)+premiumPrice
+
+
+		}else{
+			premiumPrice, err := premium(pastPriceFloat, currentPriceFloat, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			fmt.Println("2premiumPrice", premiumPrice)
+
+			profit = strikePrice+premiumPrice
+
+
+		}
+
+
+
+
+
+
+
+			
+	}
+		
+
+	return profit, nil
+}
+
+func marriedPutProfit(db *sql.DB, username string) (int, error) {
+    // Implementation for married put profit calculation
+    return 0, nil
+}
+
+func bullCallSpreadProfit(db *sql.DB, username string) (int, error) {
+    // Implementation for bull call spread profit calculation
+    return 0, nil
+}
+
+func bearPutSpreadProfit(db *sql.DB, username string) (int, error) {
+    // Implementation for bear put spread profit calculation
+    return 0, nil
+}
+
+func protectiveCollarProfit(db *sql.DB, username string) (int, error) {
+    // Implementation for protective collar profit calculation
+    return 0, nil
+}
+
+func longStraddleProfit(db *sql.DB, username string) (int, error) {
+    // Implementation for long straddle profit calculation
+    return 0, nil
+}
+
+func longStrangleProfit(db *sql.DB, username string) (int, error) {
+    // Implementation for long strangle profit calculation
+    return 0, nil
+}
+
+func longCallButterflySpreadProfit(db *sql.DB, username string) (int, error) {
+    // Implementation for long call butterfly spread profit calculation
+    return 0, nil
+}
+
+func ironCondorProfit(db *sql.DB, username string) (int, error) {
+    // Implementation for iron condor profit calculation
+    return 0, nil
+}
+
+func ironButterflyProfit(db *sql.DB, username string) (int, error) {
+    // Implementation for iron butterfly profit calculation
+    return 0, nil
+}
+
+func reversalProfit(db *sql.DB, username string) (int, error) {
+    // Implementation for reversal profit calculation
+    return 0, nil
+}
+
+
+func premium(currentPrice, strikePrice, timeToExpiry float64, isCall bool) (int, error) {
+	if currentPrice <= 0 || strikePrice <= 0 || timeToExpiry <= 0 {
+		return 0, errors.New("invalid input: prices and time to expiry must be positive")
+	}
+
+	volatility := 0.30 // 30%
+	riskFreeRate := 0.05 // 5%
+
+	d1 := (math.Log(currentPrice/strikePrice) + (riskFreeRate+0.5*volatility*volatility)*timeToExpiry) / (volatility * math.Sqrt(timeToExpiry))
+	d2 := d1 - volatility*math.Sqrt(timeToExpiry)
+
+	var optionPrice float64
+	if isCall {
+		optionPrice = currentPrice*normalCDF(d1) - strikePrice*math.Exp(-riskFreeRate*timeToExpiry)*normalCDF(d2)
+	} else {
+		optionPrice = strikePrice*math.Exp(-riskFreeRate*timeToExpiry)*normalCDF(-d2) - currentPrice*normalCDF(-d1)
+	}
+
+	return int(math.Round(optionPrice)), nil
+}
+
+func normalCDF(x float64) float64 {
+	return 0.5 * (1 + math.Erf(x/math.Sqrt(2)))
+}
 
 
 
