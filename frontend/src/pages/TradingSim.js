@@ -368,11 +368,11 @@ function TradingSim() {
       flexDirection: 'column',
       alignItems: 'center',
     }}>
-      <h1 style={{ marginTop: '20px' }}>Hello, Trader!</h1>
+      <h1 style={{ marginTop: '70px' , marginBottom:'-50px'}}>Hello, Trader!</h1>
       <img
         src={require('.././pics/goBacktoDashfromTradingSim.png')}
         alt="Go back to dashboard"
-        style={{ position: 'absolute', top: '80px', right: '1460px', cursor: 'pointer', width: '50px', height: '50px' }}
+        style={{ position: 'absolute', top: '20px', right: '1460px', cursor: 'pointer', width: '50px', height: '50px' }}
         onClick={() => navigate('/UserDashboard', { state: { username } })}
       />
       <div style={{ padding: '20px' }}>
@@ -385,7 +385,7 @@ function TradingSim() {
           maxWidth: '1200px',
           gap: '20px',
         }}>
-          <div style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius:'20px', }}>
             <h2 style={{ color: 'white' }}>Select a Company:</h2>
             <input
               type="text"
@@ -411,7 +411,7 @@ function TradingSim() {
           <div style={{
             width: '300px',
             height: '300px',
-            backgroundColor: 'white',
+            backgroundColor: '#f5e5ba',
             boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
             marginTop: '40px',
             display: 'flex',
@@ -419,6 +419,7 @@ function TradingSim() {
             justifyContent: 'center',
             alignItems: 'center',
             padding: '10px',
+            borderRadius:'20px'
           }}>
             {selectedCompany && (
               <>
@@ -430,11 +431,13 @@ function TradingSim() {
                   placeholder="Number of stocks to buy/sell"
                   value={numStocks}
                   onChange={(e) => setNumStocks(e.target.value)}
-                  style={{ padding: '10px', marginBottom: '10px', width: '200px' }}
+                  style={{ padding: '10px', marginBottom: '10px', width: '200px',               borderRadius:'20px'
+,                    backgroundColor: '#f5e5ba',
+                  }}
                 />
                 <div style={{ display: 'flex', gap: '10px' }}>
-                  <button onClick={handleBuyClick} style={{ padding: '10px', fontSize: '16px', backgroundColor:'#65ed55' }}>Buy</button>
-                  <button onClick={handleSellClick} style={{ padding: '10px', fontSize: '16px', backgroundColor:'#f55249' }}>Sell</button>
+                  <button onClick={handleBuyClick} style={{ padding: '10px', fontSize: '16px', backgroundColor:'#65ed55', borderRadius:'15px' }}>Buy</button>
+                  <button onClick={handleSellClick} style={{ padding: '10px', fontSize: '16px', backgroundColor:'#f55249', borderRadius:'15px' }}>Sell</button>
                 </div>
               </>
             )}
@@ -452,9 +455,13 @@ function TradingSim() {
             justifyContent: 'center',
             alignItems: 'center',
             padding: '10px',
+            borderRadius:'20px'
+            ,                    backgroundColor: '#f5e5ba',
           }}>
-            <h2>Cash: ${truncateMoney(cash)}</h2>
-            <h2>Networth: ${truncateMoney(networth)}</h2>
+            <h2 style={{marginBottom:'-30px'}}>Cash</h2>
+            <h2 style={{fontSize:'50px', marginBottom:'20px',}}>${truncateMoney(cash)}</h2>
+            <h2 style={{marginBottom:'0px'}}>Networth</h2>
+            <h2 style={{fontSize:'50px', marginTop:'10px'}}>${truncateMoney(networth)}</h2>
 
 
 
@@ -464,14 +471,15 @@ function TradingSim() {
        
         <div style={{
           marginTop: '50px',
-          backgroundColor: 'white',
+          backgroundColor: '#d2fad5',
           width: '100%',
           maxWidth: '500px',
           padding: '20px',
           boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
+          borderRadius:'20px'
         }}>
           <h2>Stocks you own</h2>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor:'#d2fad5' }}>
             <thead>
               <tr>
                 <th>Quantity</th>
@@ -503,12 +511,12 @@ function TradingSim() {
             alignItems: 'center',
             borderRadius: '25px',
             position: 'absolute',
-            top: '600px',
+            top: '500px',
             left: '650px',
             boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)',
           }}
         >
-          <h3 style={{ color: '#4caded', marginLeft: '100px', fontSize: '25px' }}>
+          <h3 style={{ color: '#47fc4d', marginLeft: '100px', fontSize: '25px' }}>
             Charts
           </h3>
         </button>

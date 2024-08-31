@@ -51,7 +51,7 @@ function EDU_BS() {
     height: '450px',
     marginLeft: '30px',
     position: 'absolute',
-    top: '190px',
+    top: '140px',
     left: '20px'
     , boxShadow: '0px 8px 8px rgba(0, 0, 0, 0.5)',
   };
@@ -90,7 +90,7 @@ function EDU_BS() {
     width: '1000px',
     height: '600px',
     position: 'absolute',
-    top: '410px',
+    top: '330px',
     left: '450px',
     color: '#c5d1de',
     fontSize: '16px',
@@ -111,14 +111,14 @@ function EDU_BS() {
         alignItems: 'center',
         borderRadius: '25px',
         position: 'absolute',
-        top: '100px',
+        top: '20px',
         left: '200px'
         , boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)',
 
         
 
         }}>
-        <h2 style={{ marginTop: '-40px', marginBottom: '-30px', color: 'white', marginLeft: '230px' }}>
+        <h2 style={{ marginTop: '-40px', marginBottom: '-30px', color: 'white', marginLeft: '110px', fontSize:'50px' }}>
             Black Scholes Model
         </h2>
         </div>
@@ -126,7 +126,7 @@ function EDU_BS() {
         <img
           src={require('.././pics/goBacktoDashfromTradingSim.png')}
           alt="Go back to dashboard"
-          style={{ position: 'absolute', top: '100px', right: '1460px', cursor: 'pointer', width: '50px', height: '50px' }}
+          style={{ position: 'absolute', top: '20px', right: '1460px', cursor: 'pointer', width: '50px', height: '50px' }}
           onClick={() => navigate('/BS_Dash', { state: { username } })}
         />
         
@@ -195,7 +195,7 @@ function EDU_BS() {
 
       </div>
 
-      <div style={{ color: 'black', position: 'absolute', top: '250px', right: '750px', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)', }}>
+      <div style={{ color: 'black', position: 'absolute', top: '180px', right: '700px', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)', }}>
         <div style={{
           backgroundColor: '#86ff86',
           borderRadius: '5px',
@@ -207,7 +207,7 @@ function EDU_BS() {
         </div>
       </div>
 
-      <div style={{ color: 'black', position: 'absolute', top: '250px', right: '450px', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)', }}>
+      <div style={{ color: 'black', position: 'absolute', top: '180px', right: '400px', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)', }}>
         <div style={{
           backgroundColor: '#ff7e7e',
           borderRadius: '5px',

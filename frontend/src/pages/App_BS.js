@@ -331,7 +331,7 @@ const computeImpliedVolatility = (S, C) => {
     height: '350px',
     marginLeft: '30px',
     position: 'absolute',
-    top: '250px',
+    top: '200px',
     left: '0px',
     boxShadow: '0px 8px 8px rgba(0, 0, 0, 0.5)',
   };
@@ -608,7 +608,6 @@ useEffect(() => {
 
 
 
-
   return (
     <div style={dashboardStyle}>
       <div>
@@ -616,36 +615,35 @@ useEffect(() => {
           style={{
             backgroundColor: '#22272e',
             padding: '5px',
-            width: '500px',
+            width: '650px',
             height: '100px',
             marginLeft: '300px',
             display: 'flex',
             alignItems: 'center',
             borderRadius: '25px',
             position: 'absolute',
-            top: '100px',
-            left: '0px',
+            top: '25px',
+            left: '50px',
             boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)',
           }}
         >
-          <h1 style={{ marginTop: '-40px', marginBottom: '-30px', color: 'white', marginLeft: '30px' }}>
-            Options Strategy Builder
+          <h1 style={{ marginTop: '-40px', marginBottom: '-30px', color: 'white', marginLeft: '40px' }}>
+            Options Trading Strategy Builder
           </h1>
         </div>
 
         <img
           src={require('.././pics/goBacktoDashfromTradingSim.png')}
           alt="Go back to dashboard"
-          style={{ position: 'absolute', top: '100px', right: '1460px', cursor: 'pointer', width: '50px', height: '50px' }}
-          onClick={() => navigate('/BS_Dash', { state: { username } })}
+          style={{ position: 'absolute', top: '20px', right: '1460px', cursor: 'pointer', width: '50px', height: '50px' }}
+          onClick={() => navigate('/UserDashboard', { state: { username } })}
         />
-
+       
         <div style={formContainerStyle}>
-          <label style={{ color: '#c5d1de', fontSize: '30px' }}>Projected Profits:</label>
-          <h1 style={{ color: '#c5d1de', fontSize: '30px', marginBottom: '50px' }}>${projectedProfit}</h1>
-          <label style={{ color: '#c5d1de', fontSize: '30px' }}>Cash:</label>
-          <h1 style={{ color: '#c5d1de', fontSize: '30px', marginBottom: '50px' }}>${cash}</h1>
-
+          <label style={{ color: '#c5d1de', fontSize: '38px' }}>Projected Profits:</label>
+          <h1 style={{ color: projectedProfit > 0 ? '#47fc4d' : '#fc4d4d', fontSize: '90px', marginBottom: '50px' }}>
+            ${projectedProfit}
+          </h1>          
           <button  style={buttonStyle} onClick={handleBUYOpenPopup}>Buy Option</button>
         </div>
 
@@ -661,8 +659,8 @@ useEffect(() => {
             alignItems: 'center',
             borderRadius: '25px',
             position: 'absolute',
-            top: '100px',
-            left: '515px',
+            top: '25px',
+            left: '720px',
             boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)',
           }}
         >
@@ -683,8 +681,8 @@ useEffect(() => {
             alignItems: 'center',
             borderRadius: '25px',
             position: 'absolute',
-            top: '100px',
-            left: '700px',
+            top: '25px',
+            left: '910px',
             boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)',
           }}
         >
@@ -706,8 +704,8 @@ useEffect(() => {
             alignItems: 'center',
             borderRadius: '25px',
             position: 'absolute',
-            top: '100px',
-            left: '865px',
+            top: '25px',
+            left: '1080px',
             boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.5)',
           }}
         >
@@ -817,7 +815,7 @@ useEffect(() => {
   
 )}
      {true&&(
-      <div style={{position:'absolute', top:'225px', left:'500px'}}>
+      <div style={{position:'absolute', top:'180px', left:'500px'}}>
       <ShowOptions />
 
       </div>

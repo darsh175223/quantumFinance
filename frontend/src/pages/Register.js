@@ -8,7 +8,6 @@ function Register() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  // Function to generate a random ID of 10 characters
   const generateRandomId = () => {
     return Math.random().toString(36).substring(2, 12);
   };
@@ -21,10 +20,9 @@ function Register() {
       return;
     }
 
-    const id = generateRandomId();  // Generate the ID
-    const name = `${firstName} ${lastName}`;  // Combine first and last names
+    const id = generateRandomId();
+    const name = `${firstName} ${lastName}`;
 
-    // Create a new user object with the entered data
     const user = {
       id: id,
       name: name,
@@ -54,35 +52,72 @@ function Register() {
     }
   };
 
+  const inputStyle = {
+    width: '100%',
+    padding: '0.5rem',
+    marginBottom: '1rem',
+    borderRadius: '5px',
+    border: 'none',
+    backgroundColor: '#333',
+    color: 'white'
+  };
+
+  const labelStyle = {
+    display: 'block',
+    marginBottom: '0.5rem',
+    color: '#ddd'
+  };
+
   return (
-    <div className="register-page">
-      <h2>Register for Quantum Finance</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="first-name">First Name:</label>
-          <input type="text" id="first-name" name="first-name" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
-        </div>
-        <div>
-          <label htmlFor="last-name">Last Name:</label>
-          <input type="text" id="last-name" name="last-name" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
-        </div>
-        <div>
-          <label htmlFor="username">Username:</label>
-          <input type="text" id="username" name="username" value={username} onChange={(e) => setUsername(e.target.value)} required />
-        </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input type="password" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        </div>
-        <div>
-          <label htmlFor="confirm-password">Confirm Password:</label>
-          <input type="password" id="confirm-password" name="confirm-password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-        </div>
-        <button type="submit">Register</button>
-      </form>
-      <p>
-        Already have an account? <Link to="/signin">Sign in here</Link>
-      </p>
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      minHeight: '100vh',
+      padding: '1rem'
+    }}>
+      <div style={{
+        backgroundColor: 'black',
+        padding: '2rem',
+        borderRadius: '10px',
+        color: 'white',
+        width: '100%',
+        maxWidth: '400px'
+      }}>
+        <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Register for Quantum Finance</h2>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
+          <label htmlFor="first-name" style={labelStyle}>First Name:</label>
+          <input type="text" id="first-name" name="first-name" value={firstName} onChange={(e) => setFirstName(e.target.value)} required style={inputStyle} />
+
+          <label htmlFor="last-name" style={labelStyle}>Last Name:</label>
+          <input type="text" id="last-name" name="last-name" value={lastName} onChange={(e) => setLastName(e.target.value)} required style={inputStyle} />
+
+          <label htmlFor="username" style={labelStyle}>Username:</label>
+          <input type="text" id="username" name="username" value={username} onChange={(e) => setUsername(e.target.value)} required style={inputStyle} />
+
+          <label htmlFor="password" style={labelStyle}>Password:</label>
+          <input type="password" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} required style={inputStyle} />
+
+          <label htmlFor="confirm-password" style={labelStyle}>Confirm Password:</label>
+          <input type="password" id="confirm-password" name="confirm-password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required style={inputStyle} />
+
+          <button type="submit" style={{
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            padding: '0.75rem',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            fontSize: '1rem',
+            marginTop: '1rem'
+          }}>
+            Register
+          </button>
+        </form>
+        <p style={{ textAlign: 'center', marginTop: '1rem' }}>
+          Already have an account? <Link to="/signin" style={{ color: '#4CAF50' }}>Sign in here</Link>
+        </p>
+      </div>
     </div>
   );
 }
