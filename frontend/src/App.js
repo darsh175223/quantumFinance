@@ -40,9 +40,9 @@ function App() {
         <Routes>
           <Route path="/" element={
             <div className="hero">
-              <div className="hero-content">
+              <div className="hero-content" style={{boxShadow:'15px 15px 20px rgba(0,0,0,0.8)'}}>
                 <h1 style={{ marginBottom: '70px', marginTop:'50px', marginRight:'-30px', fontSize:'50px', marginLeft:'-500px'  }}>MASTER YOUR MONEY</h1>
-                <p style={{ marginBottom: '125px',  marginRight:'-170px', fontSize:'30px',  marginLeft:'-500px' }}>AI-Driven Financial Simulations For Smarter Investing</p>
+                <p style={{ marginBottom: '125px',  marginRight:'-170px', fontSize:'30px',  marginLeft:'-500px' }}>AI-Driven Financial Services For Smarter Investing</p>
                 <Link to="/register" className="try-free-button" style={{
                   backgroundColor: '#3da5d9',
                   color: 'black',
