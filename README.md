@@ -1,4 +1,3 @@
-Here's a `README.md` file tailored for your Quantum Finance website project:
 
 # Quantum Finance
 
