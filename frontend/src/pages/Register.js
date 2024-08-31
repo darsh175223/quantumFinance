@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+const { username } = location.state || { username: 'User' };
+
 
 function Register() {
   const [firstName, setFirstName] = useState('');
@@ -7,6 +10,8 @@ function Register() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const generateRandomId = () => {
     return Math.random().toString(36).substring(2, 12);
@@ -46,6 +51,8 @@ function Register() {
       const data = await response.json();
       console.log('User registered:', data);
       alert("User registered successfully!");
+      navigate('/TradingSim', { state: { username } })
+
     } catch (error) {
       console.error('Error registering user:', error);
       alert("Error registering user. Please try again.");
