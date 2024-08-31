@@ -6,23 +6,26 @@ body, html {
   height: 100%;
   font-family: Arial, sans-serif;
 }
+  /* background-size: cover;  background-image: url('./pics/path-to-your-coin-image.jpg'); */
 
-.App {
-  text-align: center;
-  min-height: 100vh;
-  background-color: #b8aed6;
-  background-image: url('./pics/path-to-your-coin-image.jpg');
-  background-size: cover;
-  background-position: center;
-  background-blend-mode: overlay;
-}
 
+  .App {
+    text-align: center;
+    min-height: 100vh;
+    background-color: #b8aed6;
+    background-image: url('./pics/Background_landingPage.jpg');
+    background-size: cover; /* This ensures the image covers the entire background */
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    background-position: center;
+    background-blend-mode: overlay;
+  }
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 30px;
-  background-color: rgba(0, 0, 0, 0.5);
+  /* background-color: rgba(0, 0, 0, 0.5); */
+  
 }
 
 .logo {
@@ -52,6 +55,7 @@ nav a {
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
+  
 }
 
 .hero {
@@ -62,10 +66,17 @@ nav a {
 }
 
 .hero-content {
-  background-color: rgba(78, 54, 122, 0.8);
+  /* background-color: '#22272e'; */
+  background-color: #22272e;
+  background-image: url('./pics/landingPageTitleBackground.jpg');
+  background-size: cover; /* This ensures the image covers the entire background */
+  background-repeat: no-repeat; /* Prevents the image from repeating */
+  background-position: center;
+  background-blend-mode: overlay;
   padding: 40px;
-  border-radius: 10px;
-  max-width: 500px;
+  border-radius: 20px;
+  width: 1000px;
+  height: 400px;
 }
 
 h1 {
