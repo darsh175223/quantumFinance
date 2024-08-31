@@ -48,13 +48,13 @@ const ShowOptions = () => {
 
 
     if(strategy[0]=='C'||strategy[0]=='M'){
-        const [symbol, strikePrice, duration] = trade.replace(/[()]/g, '').split(',');
+        const [symbol, strikePrice, cost, duration] = trade.replace(/[()]/g, '').split(',');
     
 
         if (strategy === 'CoveredCall') {
-        description = `Covered Call for ${symbol} for strike price of $${strikePrice} with call option lasting ${duration} years`;
+        description = `Covered Call for ${symbol} for strike price of $${cost} and bought price of $${strikePrice}. Expiry: ${duration} years`;
         } else if (strategy === 'MarriedPut') {
-        description = `Married Put for ${symbol} for strike price of $${strikePrice} with put option lasting ${duration} years`;
+        description = `Married Put for ${symbol} for strike price of $${cost} and bought price of $${strikePrice}. Expiry: ${duration} years`;
         } else {
         description = `${strategy} for ${symbol} for strike price of $${strikePrice} lasting ${duration} years`;
         }

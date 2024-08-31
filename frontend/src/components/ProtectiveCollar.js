@@ -144,7 +144,6 @@ const CoveredCall = () => {
     style={{ borderColor: 'black'}}
     onChange={(e) => setTime(e.target.value)} 
 />
-                {/* The Premium input is removed, using $10 as the standard premium */}
                 <div>
                 <button  onClick={sendCoveredCall} style={{ padding: '10px', fontSize: '16px', backgroundColor:'#65ed55', borderRadius:'15px', marginTop:'20px' }}>Submit</button>
 

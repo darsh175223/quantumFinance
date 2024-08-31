@@ -487,7 +487,7 @@ func returnProfit(db *sql.DB, username string) (int, error) {
 		}
 
     }
-
+	fmt.Println("profit FINAL:", profit)
     return profit, nil
 }
 //username == StockName
@@ -569,56 +569,683 @@ func coveredCallProfit(db *sql.DB, coveredCallString string) (int, error) {
 	return profit, nil
 }
 
-func marriedPutProfit(db *sql.DB, username string) (int, error) {
-    // Implementation for married put profit calculation
-    return 0, nil
+func marriedPutProfit(db *sql.DB, coveredCallString string) (int, error) {
+   // Implementation for covered call profit calculation
+		re := regexp.MustCompile(`\(([^()]*)\)`)
+
+        // Find all matches and extract the captured groups
+        matches := re.FindAllStringSubmatch(coveredCallString, -1)
+
+		
+
+        // Create a string slice from the captured groups
+        stringSlice := make([]string, len(matches))
+        for i, match := range matches {
+                stringSlice[i] = match[1]
+        }
+		// fmt.Println(stringSlice[0])
+		profit:=0
+
+		for _, element := range stringSlice {
+			parts := strings.Split(element, ",")
+		symbol := parts[0]
+		fmt.Println(symbol)
+        strikePrice, err := strconv.Atoi(parts[1])
+		if err!=nil{
+			return  0, fmt.Errorf("invalid price format: %w", err)
+
+		}
+		pastPrice, err := strconv.ParseFloat(parts[2], 64)
+        if err != nil {
+                return 0, fmt.Errorf("invalid quantity format: %w", err)
+        }
+		time, err := strconv.ParseFloat(parts[3], 64)
+        if err != nil {
+                return 0, fmt.Errorf("invalid quantity format: %w", err)
+        }
+		currPrice, err:=getCurrentPrice(symbol)
+		if (err!=nil){
+			fmt.Println("Error", err)
+		}
+		pastPriceFloat := float64(pastPrice)
+		currentPriceFloat := float64(currPrice)
+		timeFloat := float64(time)
+		// func premium(currentPrice, strikePrice int, timeToExpiry float64, isCall bool) (int, error) {
+		if(currPrice<=float64(strikePrice)){
+		
+			fmt.Println("pastPriceFloat", pastPriceFloat, " currentPriceFloat", currentPriceFloat, " timeFloat", timeFloat)
+			premiumPrice, err := premium(currentPriceFloat, pastPriceFloat, timeFloat, false)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			fmt.Println("1premiumPrice", premiumPrice)
+			profit = int(currPrice)-int(pastPrice)-premiumPrice
+
+
+		}else{
+			premiumPrice, err := premium(pastPriceFloat, currentPriceFloat, timeFloat, false)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			fmt.Println("2premiumPrice", premiumPrice)
+
+			profit = strikePrice-int(currPrice)-premiumPrice
+
+
+		}	
+	}
+		
+
+	return profit, nil
 }
 
-func bullCallSpreadProfit(db *sql.DB, username string) (int, error) {
-    // Implementation for bull call spread profit calculation
-    return 0, nil
+
+func bullCallSpreadProfit(db *sql.DB, coveredCallString string) (int, error) {
+    // Implementation for covered call profit calculation
+		re := regexp.MustCompile(`\(([^()]*)\)`)
+
+        // Find all matches and extract the captured groups
+        matches := re.FindAllStringSubmatch(coveredCallString, -1)
+
+		
+
+        // Create a string slice from the captured groups
+        stringSlice := make([]string, len(matches))
+        for i, match := range matches {
+                stringSlice[i] = match[1]
+        }
+		// fmt.Println(stringSlice[0])
+		profit:=0
+
+		for _, element := range stringSlice {
+			parts := strings.Split(element, ",")
+		symbol := parts[0]
+        strikePrice, err := strconv.Atoi(parts[1])
+		if err!=nil{
+			return  0, fmt.Errorf("invalid price format: %w", err)
+
+		}
+		biggerStrike, err := strconv.ParseFloat(parts[2], 64)
+        if err != nil {
+                return 0, fmt.Errorf("invalid quantity format: %w", err)
+        }
+		time, err := strconv.ParseFloat(parts[3], 64)
+        if err != nil {
+                return 0, fmt.Errorf("invalid quantity format: %w", err)
+        }
+		currPrice, err:=getCurrentPrice(symbol)
+		if (err!=nil){
+			fmt.Println("Error", err)
+		}
+		biggerStrikeFloat := float64(biggerStrike)
+		strikePriceFloat := float64(strikePrice)
+		currentPriceFloat := float64(currPrice)
+		timeFloat := float64(time)
+		// func premium(currentPrice, strikePrice int, timeToExpiry float64, isCall bool) (int, error) {
+		if(currPrice>float64(biggerStrikeFloat)){
+		
+			getPremium, err := premium(currentPriceFloat, biggerStrikeFloat, timeFloat, true)
+			givePremium, err := premium(currentPriceFloat, strikePriceFloat, timeFloat, true)
+
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			profit = getPremium+int(currPrice)-int(strikePrice)-givePremium
+
+
+		}else{
+			getPremium, err := premium(currentPriceFloat, biggerStrikeFloat, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+
+			givePremium, err := premium(currentPriceFloat, strikePriceFloat, timeFloat, true)
+
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			profit = getPremium-givePremium
+
+
+		}
+
+
+
+
+
+
+
+			
+	}
+		
+
+	return profit, nil
 }
 
-func bearPutSpreadProfit(db *sql.DB, username string) (int, error) {
-    // Implementation for bear put spread profit calculation
-    return 0, nil
+func bearPutSpreadProfit(db *sql.DB, coveredCallString string) (int, error) {
+    // Implementation for covered call profit calculation
+		re := regexp.MustCompile(`\(([^()]*)\)`)
+
+        // Find all matches and extract the captured groups
+        matches := re.FindAllStringSubmatch(coveredCallString, -1)
+
+		
+
+        // Create a string slice from the captured groups
+        stringSlice := make([]string, len(matches))
+        for i, match := range matches {
+                stringSlice[i] = match[1]
+        }
+		// fmt.Println(stringSlice[0])
+		profit:=0
+
+		for _, element := range stringSlice {
+			parts := strings.Split(element, ",")
+			symbol := parts[0]
+			strikePrice, err := strconv.Atoi(parts[1])
+			if err!=nil{
+				return  0, fmt.Errorf("invalid price format: %w", err)
+
+			}
+			biggerStrike, err := strconv.ParseFloat(parts[2], 64)
+			if err != nil {
+					return 0, fmt.Errorf("invalid quantity format: %w", err)
+			}
+			time, err := strconv.ParseFloat(parts[3], 64)
+			if err != nil {
+					return 0, fmt.Errorf("invalid quantity format: %w", err)
+			}
+			currPrice, err:=getCurrentPrice(symbol)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			lowerPut := float64(biggerStrike)
+			put := float64(strikePrice)
+			currentPriceFloat := float64(currPrice)
+			timeFloat := float64(time)
+			// func premium(currentPrice, strikePrice int, timeToExpiry float64, isCall bool) (int, error) {
+			lowerPremium, err := premium(currentPriceFloat, lowerPut, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+
+			lowPremium, err := premium(currentPriceFloat, put, timeFloat, true)
+
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			profit=profit + int(max(float64(0),currentPriceFloat-put )) + int(max(float64(0),currentPriceFloat-lowerPut )) - int(lowPremium)-lowerPremium
+				
+	}
+		
+
+	return profit, nil
 }
 
-func protectiveCollarProfit(db *sql.DB, username string) (int, error) {
-    // Implementation for protective collar profit calculation
-    return 0, nil
+func protectiveCollarProfit(db *sql.DB, coveredCallString string) (int, error) {
+     // Implementation for covered call profit calculation
+		re := regexp.MustCompile(`\(([^()]*)\)`)
+
+        // Find all matches and extract the captured groups
+        matches := re.FindAllStringSubmatch(coveredCallString, -1)
+
+		
+
+        // Create a string slice from the captured groups
+        stringSlice := make([]string, len(matches))
+        for i, match := range matches {
+                stringSlice[i] = match[1]
+        }
+		// fmt.Println(stringSlice[0])
+		profit:=0
+
+		for _, element := range stringSlice {
+			parts := strings.Split(element, ",")
+			symbol := parts[0]
+			call, err := strconv.Atoi(parts[1])
+			if err!=nil{
+				return  0, fmt.Errorf("invalid price format: %w", err)
+
+			}
+			put, err := strconv.ParseFloat(parts[2], 64)
+			if err != nil {
+					return 0, fmt.Errorf("invalid quantity format: %w", err)
+			}
+			time, err := strconv.ParseFloat(parts[3], 64)
+			if err != nil {
+					return 0, fmt.Errorf("invalid quantity format: %w", err)
+			}
+			currPrice, err:=getCurrentPrice(symbol)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			putFloat := float64(put)
+			callFloat := float64(call)
+			currentPriceFloat := float64(currPrice)
+			timeFloat := float64(time)
+			// func premium(currentPrice, strikePrice int, timeToExpiry float64, isCall bool) (int, error) {
+			gainPremium, err := premium(currentPriceFloat, callFloat, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+
+			lossPremium, err := premium(currentPriceFloat, putFloat, timeFloat, true)
+
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			profit=profit + int(max(float64(0),putFloat-currentPriceFloat )) + int(max(float64(0),currentPriceFloat-callFloat )) - lossPremium-gainPremium
+				
+	}
+		
+	fmt.Println("profit", profit)
+	return profit, nil
 }
 
-func longStraddleProfit(db *sql.DB, username string) (int, error) {
-    // Implementation for long straddle profit calculation
-    return 0, nil
+func longStraddleProfit(db *sql.DB, coveredCallString string) (int, error) {
+    // Implementation for covered call profit calculation
+		re := regexp.MustCompile(`\(([^()]*)\)`)
+
+        // Find all matches and extract the captured groups
+        matches := re.FindAllStringSubmatch(coveredCallString, -1)
+
+		
+
+        // Create a string slice from the captured groups
+        stringSlice := make([]string, len(matches))
+        for i, match := range matches {
+                stringSlice[i] = match[1]
+        }
+		// fmt.Println(stringSlice[0])
+		profit:=0
+
+		for _, element := range stringSlice {
+			parts := strings.Split(element, ",")
+			symbol := parts[0]
+			call, err := strconv.Atoi(parts[1])
+			if err!=nil{
+				return  0, fmt.Errorf("invalid price format: %w", err)
+
+			}
+			put, err := strconv.ParseFloat(parts[2], 64)
+			if err != nil {
+					return 0, fmt.Errorf("invalid quantity format: %w", err)
+			}
+			time, err := strconv.ParseFloat(parts[3], 64)
+			if err != nil {
+					return 0, fmt.Errorf("invalid quantity format: %w", err)
+			}
+			currPrice, err:=getCurrentPrice(symbol)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			putFloat := float64(put)
+			callFloat := float64(call)
+			currentPriceFloat := float64(currPrice)
+			timeFloat := float64(time)
+			// func premium(currentPrice, strikePrice int, timeToExpiry float64, isCall bool) (int, error) {
+			callPremium, err := premium(currentPriceFloat, callFloat, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+
+			putPremium, err := premium(currentPriceFloat, putFloat, timeFloat, true)
+
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			profit=profit + int(putFloat)*((int)(max(float64(0),callFloat-currentPriceFloat )) + int(max(float64(0),currentPriceFloat-callFloat )) - putPremium-callPremium)
+				
+	}
+		
+	fmt.Println("profit", profit)
+	return profit, nil
 }
 
-func longStrangleProfit(db *sql.DB, username string) (int, error) {
-    // Implementation for long strangle profit calculation
-    return 0, nil
+func longStrangleProfit(db *sql.DB, coveredCallString string) (int, error) {
+    // Implementation for covered call profit calculation
+		re := regexp.MustCompile(`\(([^()]*)\)`)
+
+        // Find all matches and extract the captured groups
+        matches := re.FindAllStringSubmatch(coveredCallString, -1)
+
+		
+
+        // Create a string slice from the captured groups
+        stringSlice := make([]string, len(matches))
+        for i, match := range matches {
+                stringSlice[i] = match[1]
+        }
+		// fmt.Println(stringSlice[0])
+		profit:=0
+
+		for _, element := range stringSlice {
+			parts := strings.Split(element, ",")
+			symbol := parts[0]
+			call, err := strconv.Atoi(parts[1])
+			if err!=nil{
+				return  0, fmt.Errorf("invalid price format: %w", err)
+
+			}
+			put, err := strconv.ParseFloat(parts[2], 64)
+			if err != nil {
+					return 0, fmt.Errorf("invalid quantity format: %w", err)
+			}
+			time, err := strconv.ParseFloat(parts[3], 64)
+			if err != nil {
+					return 0, fmt.Errorf("invalid quantity format: %w", err)
+			}
+			currPrice, err:=getCurrentPrice(symbol)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			putFloat := float64(put)
+			callFloat := float64(call)
+			currentPriceFloat := float64(currPrice)
+			timeFloat := float64(time)
+			// func premium(currentPrice, strikePrice int, timeToExpiry float64, isCall bool) (int, error) {
+			callPremium, err := premium(currentPriceFloat, callFloat, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+
+			putPremium, err := premium(currentPriceFloat, putFloat, timeFloat, true)
+
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			profit=profit + (int)(max(float64(0), putFloat-currentPriceFloat)) +(int)(max(float64(0), currentPriceFloat-callFloat))- putPremium-callPremium
+				
+	}
+		
+	fmt.Println("profit", profit)
+	return profit, nil
 }
 
-func longCallButterflySpreadProfit(db *sql.DB, username string) (int, error) {
-    // Implementation for long call butterfly spread profit calculation
-    return 0, nil
+func longCallButterflySpreadProfit(db *sql.DB, coveredCallString string) (int, error) {
+    // Implementation for covered call profit calculation
+		re := regexp.MustCompile(`\(([^()]*)\)`)
+
+        // Find all matches and extract the captured groups
+        matches := re.FindAllStringSubmatch(coveredCallString, -1)
+
+		
+
+        // Create a string slice from the captured groups
+        stringSlice := make([]string, len(matches))
+        for i, match := range matches {
+                stringSlice[i] = match[1]
+        }
+		// fmt.Println(stringSlice[0])
+		profit:=0
+
+		for _, element := range stringSlice {
+			parts := strings.Split(element, ",")
+			symbol := parts[0]
+			call, err := strconv.Atoi(parts[1])
+			if err!=nil{
+				return  0, fmt.Errorf("invalid price format: %w", err)
+
+			}
+			put, err := strconv.ParseFloat(parts[2], 64)
+			if err != nil {
+					return 0, fmt.Errorf("invalid quantity format: %w", err)
+			}
+			time, err := strconv.ParseFloat(parts[3], 64)
+			if err != nil {
+					return 0, fmt.Errorf("invalid quantity format: %w", err)
+			}
+			currPrice, err:=getCurrentPrice(symbol)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			putFloat := float64(put)
+			callFloat := float64(call)
+			currentPriceFloat := float64(currPrice)
+			timeFloat := float64(time)
+			// func premium(currentPrice, strikePrice int, timeToExpiry float64, isCall bool) (int, error) {
+			buylowPremium, err := premium(currentPriceFloat, callFloat, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+
+			sell2Premium, err := premium(currentPriceFloat, ((callFloat+putFloat)/2), timeFloat, true)
+
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+
+			buyhighPremium, err := premium(currentPriceFloat, putFloat, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			
+			profit=profit + (int)(max(float64(0),currentPriceFloat- putFloat))+  2* (int)(max(float64(0), float64(currentPriceFloat-((callFloat+putFloat)/float64(2)))) )+ (int)(max(float64(0), currentPriceFloat-callFloat))+ 2*sell2Premium - buyhighPremium-buylowPremium
+				
+	}
+		
+	fmt.Println("profit", profit)
+	return profit, nil
 }
 
-func ironCondorProfit(db *sql.DB, username string) (int, error) {
-    // Implementation for iron condor profit calculation
-    return 0, nil
+func ironCondorProfit(db *sql.DB, coveredCallString string) (int, error) {
+    // Implementation for covered call profit calculation
+		re := regexp.MustCompile(`\(([^()]*)\)`)
+
+        // Find all matches and extract the captured groups
+        matches := re.FindAllStringSubmatch(coveredCallString, -1)
+
+		
+
+        // Create a string slice from the captured groups
+        stringSlice := make([]string, len(matches))
+        for i, match := range matches {
+                stringSlice[i] = match[1]
+        }
+		// fmt.Println(stringSlice[0])
+		profit:=0
+
+		for _, element := range stringSlice {
+			parts := strings.Split(element, ",")
+			symbol := parts[0]
+			call, err := strconv.Atoi(parts[1])
+			if err!=nil{
+				return  0, fmt.Errorf("invalid price format: %w", err)
+
+			}
+			put, err := strconv.ParseFloat(parts[2], 64)
+			if err != nil {
+					return 0, fmt.Errorf("invalid quantity format: %w", err)
+			}
+			time, err := strconv.ParseFloat(parts[3], 64)
+			if err != nil {
+					return 0, fmt.Errorf("invalid quantity format: %w", err)
+			}
+			currPrice, err:=getCurrentPrice(symbol)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			fmt.Println("currPrice", currPrice)
+			high := float64(call)
+			low := float64(put)
+			currentPriceFloat := float64(currPrice)
+			timeFloat := float64(time)
+			veryHigh := float64((high-low)/2+high)
+			veryLow := float64(low-(high-low)/2)
+			// func premium(currentPrice, strikePrice int, timeToExpiry float64, isCall bool) (int, error) {
+			lowPremium, err := premium(currentPriceFloat, low, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			veryLowPremium, err := premium(currentPriceFloat, veryLow, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			highPremium, err := premium(currentPriceFloat, high, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			veryHighPremium, err := premium(currentPriceFloat, veryHigh, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			
+			profit=profit +  (int)(max(float64(0),currentPriceFloat- high))+ (int)(max(float64(0),currentPriceFloat- veryHigh)) +(int)(max(float64(0),currentPriceFloat- low))+  (int)(max(float64(0), currentPriceFloat-veryLow) )+ lowPremium-veryLowPremium+highPremium-veryHighPremium
+				
+	}
+		
+	fmt.Println("profit", profit)
+	return profit, nil
 }
 
-func ironButterflyProfit(db *sql.DB, username string) (int, error) {
-    // Implementation for iron butterfly profit calculation
-    return 0, nil
+func ironButterflyProfit(db *sql.DB, coveredCallString string) (int, error) {
+		// Implementation for covered call profit calculation
+		re := regexp.MustCompile(`\(([^()]*)\)`)
+
+        // Find all matches and extract the captured groups
+        matches := re.FindAllStringSubmatch(coveredCallString, -1)
+
+		
+
+        // Create a string slice from the captured groups
+        stringSlice := make([]string, len(matches))
+        for i, match := range matches {
+                stringSlice[i] = match[1]
+        }
+		// fmt.Println(stringSlice[0])
+		profit:=0
+
+		for _, element := range stringSlice {
+			parts := strings.Split(element, ",")
+			symbol := parts[0]
+			call, err := strconv.Atoi(parts[1])
+			if err!=nil{
+				return  0, fmt.Errorf("invalid price format: %w", err)
+
+			}
+			put, err := strconv.ParseFloat(parts[2], 64)
+			if err != nil {
+					return 0, fmt.Errorf("invalid quantity format: %w", err)
+			}
+			time, err := strconv.ParseFloat(parts[3], 64)
+			if err != nil {
+					return 0, fmt.Errorf("invalid quantity format: %w", err)
+			}
+			currPrice, err:=getCurrentPrice(symbol)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			fmt.Println("currPrice", currPrice)
+			middle := float64(call)
+			rangePrice := float64(put)
+			currentPriceFloat := float64(currPrice)
+			timeFloat := float64(time)
+			
+			high:=float64(rangePrice/2+middle)
+			low:=float64(middle-rangePrice/2)
+
+
+
+			
+			// func premium(currentPrice, strikePrice int, timeToExpiry float64, isCall bool) (int, error) {
+			middleCallPremium, err := premium(currentPriceFloat, middle, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+		
+			middlePutPremium, err := premium(currentPriceFloat, middle, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			lowPutPremium, err := premium(currentPriceFloat, low, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+		
+			highCallPremium, err := premium(currentPriceFloat, high, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+
+
+		
+			profit=profit +(int)(max(float64(0),low-currentPriceFloat))+(int)(max(float64(0),currentPriceFloat- high))+ (int)(max(float64(0),middle-currentPriceFloat)) +(int)(max(float64(0),currentPriceFloat- middle))+highCallPremium+middleCallPremium-middlePutPremium-lowPutPremium
+				
+	}
+		
+	fmt.Println("profit", profit)
+	return profit, nil
 }
 
-func reversalProfit(db *sql.DB, username string) (int, error) {
-    // Implementation for reversal profit calculation
-    return 0, nil
-}
+func reversalProfit(db *sql.DB, coveredCallString string) (int, error) {
+    // Implementation for covered call profit calculation
+		re := regexp.MustCompile(`\(([^()]*)\)`)
 
+        // Find all matches and extract the captured groups
+        matches := re.FindAllStringSubmatch(coveredCallString, -1)
+
+		
+
+        // Create a string slice from the captured groups
+        stringSlice := make([]string, len(matches))
+        for i, match := range matches {
+                stringSlice[i] = match[1]
+        }
+		// fmt.Println(stringSlice[0])
+		profit:=0
+
+		for _, element := range stringSlice {
+			parts := strings.Split(element, ",")
+			symbol := parts[0]
+			call, err := strconv.Atoi(parts[1])
+			if err!=nil{
+				return  0, fmt.Errorf("invalid price format: %w", err)
+
+			}
+			put, err := strconv.ParseFloat(parts[2], 64)
+			if err != nil {
+					return 0, fmt.Errorf("invalid quantity format: %w", err)
+			}
+			time, err := strconv.ParseFloat(parts[3], 64)
+			if err != nil {
+					return 0, fmt.Errorf("invalid quantity format: %w", err)
+			}
+			currPrice, err:=getCurrentPrice(symbol)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+			fmt.Println("currPrice", currPrice)
+			middle := float64(call)
+			rangePrice := float64(put)
+			currentPriceFloat := float64(currPrice)
+			timeFloat := float64(time)
+			
+			high:=float64(rangePrice/2+middle)
+			low:=float64(middle-rangePrice/2)
+
+
+
+			
+			// func premium(currentPrice, strikePrice int, timeToExpiry float64, isCall bool) (int, error) {
+			
+			lowPutPremium, err := premium(currentPriceFloat, low, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+		
+			highCallPremium, err := premium(currentPriceFloat, high, timeFloat, true)
+			if (err!=nil){
+				fmt.Println("Error", err)
+			}
+
+
+		
+			profit=profit +(int)(max(float64(0),low-currentPriceFloat))+(int)(max(float64(0),currentPriceFloat- high))- highCallPremium+lowPutPremium		
+	}
+		
+	fmt.Println("profit", profit)
+	return profit, nil
+}
 
 func premium(currentPrice, strikePrice, timeToExpiry float64, isCall bool) (int, error) {
 	if currentPrice <= 0 || strikePrice <= 0 || timeToExpiry <= 0 {
@@ -644,8 +1271,12 @@ func premium(currentPrice, strikePrice, timeToExpiry float64, isCall bool) (int,
 func normalCDF(x float64) float64 {
 	return 0.5 * (1 + math.Erf(x/math.Sqrt(2)))
 }
-
-
+func max(a, b float64) float64 {
+	if a > b {
+			return a
+	}
+	return b
+}
 
 // Function to retrieve non-null column values for a specific username
 func getNonNullColumns(db *sql.DB, username string) ([]string, error) {
