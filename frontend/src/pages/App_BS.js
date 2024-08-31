@@ -43,7 +43,6 @@ function EDU_BS() {
   const [isStratPopupOpen, setisStratPopupOpen] = useState(false); // State to manage popup visibility
   const [isBUYtPopupOpen, setisBUYtPopupOpen] = useState(false); // State to manage popup visibility
 
-
   const [impliedVolatility, setimpliedVolatility] = useState(0);
   const [selectedCompany, setSelectedCompany] = useState("");
   const [searchTerm, setSearchTerm] = useState('');
@@ -553,7 +552,31 @@ const computeImpliedVolatility = (S, C) => {
       setConfirmed(true);
     }
   };
+// Fetch the cash value asynchronously
+useEffect(() => {
+  const fetchNetworth = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/sendProfit', {
+        params: { username: username },
+      });
+      console.log("Networth value: ", response.data.cash);
 
+      if (response.data && response.data.cash !== undefined) {
+        console.log("Good ending:v2");
+        setProjectedProfit(response.data.cash);
+      } else {
+        console.error('Unexpected response data:', response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching Networth value:', error);
+    }
+
+    // Delay the next fetch by 5 minutes (300,000 milliseconds)
+    setTimeout(fetchNetworth, 300000);
+  };
+
+  fetchNetworth();
+}, [username]);
   const renderSelectedComponent = () => {
     switch (selectedComponent) {
       // case 'button':
@@ -582,6 +605,8 @@ const computeImpliedVolatility = (S, C) => {
       </div>
     );
   }
+
+
 
 
   return (

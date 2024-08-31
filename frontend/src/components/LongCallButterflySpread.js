@@ -117,7 +117,7 @@ const CoveredCall = () => {
 
 
                 <div>
-                <h4>Enter price of bought Call(It's lower than Call2)</h4>
+                <h4>Enter price of bought Call1(It's lower than current Price)</h4>
                 <input 
                     type="number" 
                     placeholder="Call Price..." 
@@ -125,7 +125,7 @@ const CoveredCall = () => {
                     style={{ borderColor: 'black'}}
                     onChange={(e) => setStockPrice(e.target.value)} 
                 />
-                        <h4>Enter strike price of bought Call2</h4>
+                        <h4>Enter strike price of bought Call2(higher than current Price)</h4>
 
                 <input 
                     type="number" 

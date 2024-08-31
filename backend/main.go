@@ -747,6 +747,9 @@ func sendOptions(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response)
 }
+type profitStruct struct {
+	Profit  int `json:"cash"`
+}
 
 func sendProfit(c *gin.Context) {
 	username, usernameOK := c.GetQuery("username")
@@ -768,12 +771,12 @@ func sendProfit(c *gin.Context) {
 
 
 
-	// response := SendOptions{
-	// 	Options:  optionsList,
+	response := profitStruct{
+		Profit:  profit,
 	
-	// }
+	}
 
-	c.JSON(http.StatusOK, profit)
+	c.JSON(http.StatusOK, response)
 }
 
 func main() {
