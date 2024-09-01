@@ -82,12 +82,6 @@ function EDU_BS() {
     }));
   }, [stockPrice, strikePrice, timeToMaturity, volatility]);
 
-  
-
-
-
-
-
   const calculateImpliedVolatility = async () => {
     try {
       const apiKey = '23ba00821f554f1483efe54897bedd08';

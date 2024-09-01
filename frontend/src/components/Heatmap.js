@@ -34,7 +34,7 @@ export function Heatmap({ title, inputs, heatmapParams, type }) {
     title: title,
     xaxis: { title: 'Spot Price', gridcolor: '#444', linecolor: '#444' },
     yaxis: { title: 'Volatility', gridcolor: '#444', linecolor: '#444' },
-    paper_bgcolor: 'white',
+    paper_bgcolor: 'transparent',
     plot_bgcolor: 'white',
     font: { color: 'black' },
   };
