@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
-const { username } = location.state || { username: 'User' };
 
 
 function Register() {
@@ -12,6 +11,7 @@ function Register() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
+
 
   const generateRandomId = () => {
     return Math.random().toString(36).substring(2, 12);

@@ -67,7 +67,7 @@ def get_stock_news(query, api_key):
             if sModelAns == 0:
                 sModelAns = -1
             hybridSentiment = (sModelAns * midModelConf)**7 + sentiment_dict['compound']
-            growthPrediction = 0.0389 * hybridSentiment - 0.015
+            growthPrediction = 0.035 * hybridSentiment +0.0051
             final_sentiment += growthPrediction
 
         growthPrediction = final_sentiment / 10
