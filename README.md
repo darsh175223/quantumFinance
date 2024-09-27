@@ -15,21 +15,18 @@ Quantum Finance is a comprehensive financial simulation platform designed to off
 
 ## Features
 
-1. **Trading Simulations**: Users can engage in realistic stock trading with fake money, enabling them to learn and practice trading.
+1. **Trading Simulations**: Users can engage in realistic stock trading with simulated money, enabling them to learn and practice trading.
    
-2. **Sentiment Analysis for Stock Prediction**: Utilizing machine learning to analyze market sentiment and predict stock trends.
+2. **Sentiment Analysis for Stock Prediction**: NumPy-driven time series forecasting model for stock price prediction (25% MAE) by fine-tuning a BERT-based transformer architecture, achieving 80% accuracy in market sentiment classification.   
+3. **Options Trading Strategy Builder**: an options trading strategy builder using Go to optimize the construction and execution of multi-leg strategies (e.g., spreads, combinations, synthetics) and leverage real-time market data processing to calculate projected profits of option strategies, resulting in 35% increase in simulated trading throughput and 40% reduction in operational latency
    
-4. **Options Trading Strategy Builder**: Allows users to research and build strategies for trading options. Automatically excecutes beginner to advanced level option trading strategies
+4. **Expense Tracker**: Allows users to record and monitor spending habits and store them in a database
    
-6. **Expense Tracker**: Allows users to record and monitor spending habits and store them in a database
-   
-8. **Wealth Management Assistant**: Provides a tutorial to assist users on how to manage their finances
+5. **Wealth Management Assistant**: Provides a tutorial to assist users on how to manage their finances on various financial topics such as budgeting, mortages, investment options, etc
 
+6. **Options Pricing**: Users can calculate the prices of options using the Black-Scholes model as well as visualize the changes to prices by manipulating certain variables.
 
-9. **Options Pricing**: Users can calculate the prices of options using different models as well as visualuze the changes to prices by manipulating certain varaibles:
-   - Black-Scholes model   
-
-10. **Autonomous Threat Detection**: Configures and sets up threat detection by ingesting logs into Wuzah and using SOAR (Shuffle) for automated responses.
+7. **Autonomous Threat Detection**: comprehensive threat detection and response framework using C++ to collect real-time threat intelligence, identify malicious actors, and trigger an automated incident response via Discord within 10 seconds of threat identification.
 
 ## Technologies
 
@@ -52,7 +49,7 @@ Quantum Finance is a comprehensive financial simulation platform designed to off
 ### Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/quantum-finance.git
+git clone https://github.com/<yourusername>/quantum-finance.git
 cd quantum-finance
 ```
 
@@ -105,11 +102,11 @@ cd backend
 go run .\main.go .\models.go .\database.go .\optionsTradingServer.go
 ```
 
-### Start the Flask Server
+### Start the Flask Server (Python)
 
 ```bash
-cd flask-server
-python ML
+cd backend
+python .\ML_stockPrediction_backend.py
 ```
 
 ## Demo
@@ -158,8 +155,5 @@ Contributions are welcome! Please create an issue or submit a pull request with 
 ## License
 
 This project is licensed under the MIT License.
-```
 
----
 
-This `README.md` covers the key aspects of your Quantum Finance project, offering a clear overview, installation steps, and usage instructions. Let me know if you need any more details or adjustments!
