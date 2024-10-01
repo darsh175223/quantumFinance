@@ -19,29 +19,23 @@ function Register() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    const inputUsername = username
+    console.log("inputUsername", inputUsername)
 
     if (password !== confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
+    
 
     const id = generateRandomId();
     const name = `${firstName} ${lastName}`;
 
-    const user = {
-      id: id,
-      name: name,
-      username: username,
-      password: password,
-    };
+  
 
     try {
-      const response = await fetch('http://localhost:8080/users', {
+      const response = await fetch(`http://localhost:8080/register?username=${encodeURIComponent(inputUsername)}&password=${encodeURIComponent(password)}&name=${encodeURIComponent(name)}&ID=${encodeURIComponent(id)}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(user),
       });
 
       if (!response.ok) {
@@ -51,7 +45,7 @@ function Register() {
       const data = await response.json();
       console.log('User registered:', data);
       alert("User registered successfully!");
-      navigate('/TradingSim', { state: { username } })
+      navigate('/UserDashboard', { state: { username } })
 
     } catch (error) {
       console.error('Error registering user:', error);

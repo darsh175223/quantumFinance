@@ -107,6 +107,7 @@ func login(c *gin.Context) {
 	user, err := tryLogin(db, password, username)
 	if err != nil {
 		// If login fails, return a 404 Not Found status
+		fmt.Println("error:", err)
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "User not found."})
 		return
 	}
@@ -179,26 +180,49 @@ func sellStock(c *gin.Context) {
 }
 
 
-func createUser(c *gin.Context) {
-	var newUser User
+func Register(c *gin.Context) {
+	fmt.Println("reached here")
 
-	// Bind the JSON payload to the newUser struct
-	if err := c.BindJSON(&newUser); err != nil {
-		fmt.Println(err)
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid request payload"})
+	username, usernameOK := c.GetQuery("username")
+	password, quantityOk := c.GetQuery("password")
+	name, stockOk := c.GetQuery("name")
+	ID, priceOk := c.GetQuery("ID")
+
+	if !usernameOK || !quantityOk || !stockOk || !priceOk {
+		fmt.Println("Missing required parameters")
+		fmt.Println("username", username)
+		fmt.Println("password", password)
+		fmt.Println("firstname", name)
+		fmt.Println("lastname", ID)
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Missing required parameters"})
 		return
 	}
 
-	// Save the new user to the database
-	err := CreateUser(db, newUser)
+	
+
+
+	fmt.Println("got the id", ID)
+
+	
+
+
+	// Attempt to retrieve the user by username and password
+	user, err := CreateUser(db, username, password, name,ID )
+	fmt.Println("Query passed")
+
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Failed to create user"})
+		// If login fails, return a 404 Not Found status
+		fmt.Println("error is", err)
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "User not found."})
 		return
 	}
+	fmt.Println("There's no err, user is found/registered")
 
-	// Return the newly created user as a JSON response with a 201 Created status
-	c.IndentedJSON(http.StatusCreated, newUser)
+	// Return the user details as a JSON response with a 200 OK status
+	c.IndentedJSON(http.StatusOK, user)
 }
+
+
 type Response struct {
 	QuantitySlice  []string `json:"quantitySlice"`
 	NameSlice []string `json:"nameSlice"`
@@ -847,7 +871,7 @@ func main() {
 
 	router.GET("/users", getUsers)
 	router.GET("/users/:id", getUserbyID)
-	router.POST("/users", createUser)
+	router.POST("/register", Register)
 	router.PATCH("/login", login)
 	router.PATCH("/buy", buyStock)
 	router.PATCH("/sell", sellStock) 
