@@ -18,7 +18,6 @@ import (
 	"regexp"
 )
 
-
 type userOptions struct {
 	Username    string `json:"username"`
 	CoveredCall     string `json:"coveredCall"`
@@ -33,11 +32,7 @@ type userOptions struct {
 	IronButterfly     string `json:"ironButterfly"`
 	Conversion     string `json:"conversion"`
 	Reversal     string `json:"reversal"`
-
-
-	
 }
-
 
 // Function to update the coveredCall value for a specific username
 func updateCoveredCall(db *sql.DB, username string, newCoveredCall string) (string, error) {
@@ -708,13 +703,6 @@ func bullCallSpreadProfit(db *sql.DB, coveredCallString string) (int, error) {
 
 
 		}
-
-
-
-
-
-
-
 			
 	}
 		

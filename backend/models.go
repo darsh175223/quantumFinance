@@ -57,7 +57,7 @@ func GetUsers(db *sql.DB) ([]User, error) {
 // GetUserByID retrieves a single user by their ID
 func GetUserByID(id string) (*User, error) {
 	var user User
-	err := db.QueryRow("SELECT id, name, username, password FROM books WHERE id = ?", id).Scan(
+	err := db.QueryRow("SELECT id, name, username, password FROM books WHERE id = $1", id).Scan(
 		&user.ID, &user.Name, &user.Username, &user.Password)
 	if err == sql.ErrNoRows {
 		return nil, errors.New("user not found")
@@ -68,24 +68,36 @@ func GetUserByID(id string) (*User, error) {
 	return &user, nil
 }
 
-// CreateUser inserts a new user into the database
-func CreateUser(db *sql.DB, user User) error {
-	query := `INSERT INTO books (id, name, username, password) VALUES (?, ?, ?, ?)`
+// CreateUser inserts a new user into the "users" table and returns the created user or an error
+func CreateUser(db *sql.DB, username string, password string, name string, ID string) (*User, error) {
+	// SQL query to insert a new user into the "users" table
+	query := `INSERT INTO books (id, username, password, name) 
+			  VALUES ($1, $2, $3, $4) 
+			  RETURNING id, username,password, name`
 
-	// Execute the query
-	_, err := db.Exec(query, user.ID, user.Name, user.Username, user.Password)
+	// Prepare the User struct to store the returned values
+	var newUser User
+
+	// Execute the insert query and scan the returned values into the newUser struct
+	err := db.QueryRow(query, ID, username, password, name).Scan(&newUser.ID, &newUser.Username, &newUser.Name, &newUser.Password)
 	if err != nil {
-		return fmt.Errorf("CreateUser: %v", err)
+		return nil, fmt.Errorf("error inserting new user: %v", err)
 	}
 
-	return nil
+	// Password is not included in the returned struct for security reasons, but you can store it in the DB
+	newUser.Password = password
+	fmt.Println("Successfully inserted data")
+
+	// Return the newly created user
+	return &newUser, nil
 }
+
 
 // tryLogin retrieves a user from the database by username and password
 func tryLogin(db *sql.DB, password string, username string) (*User, error) {
 	var user User
 
-	query := `SELECT id, name, username, password FROM books WHERE username = ? AND password = ? LIMIT 1`
+	query := `SELECT id, name, username, password FROM books WHERE username = $1 AND password = $2 LIMIT 1`
 
 	// Execute the query
 	err := db.QueryRow(query, username, password).Scan(&user.ID, &user.Name, &user.Username, &user.Password)
@@ -105,7 +117,8 @@ func AddTupleToStockTrades(db *sql.DB, username string, newTuple string) (*User,
 	var currentStockTrades sql.NullString
 	var addingStock User
 
-	query := `SELECT stockTrades FROM books WHERE username = ? LIMIT 1`
+	// PostgreSQL uses $1, $2, etc. instead of ?
+	query := `SELECT stockTrades FROM books WHERE username = $1 LIMIT 1`
 	err := db.QueryRow(query, username).Scan(&currentStockTrades)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -123,19 +136,18 @@ func AddTupleToStockTrades(db *sql.DB, username string, newTuple string) (*User,
 	}
 
 	// Update the stockTrades value in the database
-	_, err = db.Exec("UPDATE books SET stockTrades = ? WHERE username = ?", updatedStockTrades, username)
+	_, err = db.Exec("UPDATE books SET stockTrades = $1 WHERE username = $2", updatedStockTrades, username)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update stockTrades: %v", err)
 	}
 
-	err = db.QueryRow("SELECT id, name, username, stockTrades FROM books WHERE username = ?", username).Scan(&addingStock.ID, &addingStock.Name, &addingStock.Username, &addingStock.StockTrades)
+	// Retrieve updated user info
+	err = db.QueryRow("SELECT id, name, username, stockTrades FROM books WHERE username = $1", username).Scan(&addingStock.ID, &addingStock.Name, &addingStock.Username, &addingStock.StockTrades)
 	if err != nil {
 		return nil, fmt.Errorf("error retrieving updated user: %v", err)
 	}
 	return &addingStock, nil
 }
-
-
 
 
 // RemoveTupleInStockTrades removes the specified tuple from the stockTrades column for the given user
@@ -151,7 +163,7 @@ func RemoveTupleInStockTrades(db *sql.DB, username string, symbolToRemove string
 	var updatedUser User
 
 	// SQL query to retrieve the stockTrades column for the specified user
-	query := `SELECT stockTrades FROM books WHERE username = ? LIMIT 1`
+	query := `SELECT stockTrades FROM books WHERE username = $1 LIMIT 1`
 	err = db.QueryRow(query, username).Scan(&currentStockTrades)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -247,7 +259,7 @@ func RemoveTupleInStockTrades(db *sql.DB, username string, symbolToRemove string
 	updatedStockTrades := strings.Join(updatedTrades, ", ")
 
 	// SQL query to update the stockTrades column
-	updateQuery := `UPDATE books SET stockTrades = ? WHERE username = ?`
+	updateQuery := `UPDATE books SET stockTrades = $1 WHERE username = $2`
 	_, err = db.Exec(updateQuery, updatedStockTrades, username)
 	if err != nil {
 		return nil, nil,nil,fmt.Errorf("failed to update stockTrades: %v", err)
@@ -285,7 +297,7 @@ func sendSymbolandPrice(db *sql.DB, username string,  quantityToRemove string) (
 	var updatedUser User
 
 	// SQL query to retrieve the stockTrades column for the specified user
-	query := `SELECT stockTrades FROM books WHERE username = ? LIMIT 1`
+	query := `SELECT stockTrades FROM books WHERE username = $1 LIMIT 1`
 	err = db.QueryRow(query, username).Scan(&currentStockTrades)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -341,7 +353,7 @@ func setCash(db *sql.DB, username string, cashValue string) (*User, error) {
 	truncatedCash := fmt.Sprintf("%.2f", cashFloat)
 
 	// SQL query to update the cash value
-	query := "UPDATE books SET cash = ? WHERE username = ?"
+	query := "UPDATE books SET cash = $1 WHERE username = $2"
 	_, err = db.Exec(query, truncatedCash, username)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update cash: %v", err)
@@ -354,7 +366,7 @@ func setCash(db *sql.DB, username string, cashValue string) (*User, error) {
 // setNetworth sets the networth value for a given user by their username
 func setNetworth(db *sql.DB, username string, networthValue string) (*User, error) {
 	// SQL query to update the networth value
-	query := `UPDATE books SET networth = ? WHERE username = ?`
+	query := `UPDATE books SET networth = $1 WHERE username = $2`
 	_, err := db.Exec(query, networthValue, username)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update networth: %v", err)
@@ -362,7 +374,7 @@ func setNetworth(db *sql.DB, username string, networthValue string) (*User, erro
 
 	// Retrieve the updated user record to confirm the operation
 	var updatedUser User
-	err = db.QueryRow("SELECT id, name, username, cash, networth FROM books WHERE username = ? LIMIT 1", username).Scan(
+	err = db.QueryRow("SELECT id, name, username, cash, networth FROM books WHERE username = $1 LIMIT 1", username).Scan(
 		&updatedUser.ID, &updatedUser.Name, &updatedUser.Username, &updatedUser.Cash, &updatedUser.Networth,
 	)
 	if err != nil {
@@ -380,7 +392,7 @@ func GetCash(db *sql.DB, username string) (string, error) {
 	var cash string
 
 	// SQL query to retrieve the cash value
-	query := `SELECT cash FROM books WHERE username = ? LIMIT 1`
+	query := `SELECT cash FROM books WHERE username = $1 LIMIT 1`
 	err := db.QueryRow(query, username).Scan(&cash)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -424,7 +436,7 @@ func getCurrentPrice(stockName string) (float64, error) {
 func calculateNetworth(db *sql.DB, username string) (float64, error) {
 	// Retrieve the user's cash and stockTrades
 	var user User
-	query := `SELECT cash, stockTrades FROM books WHERE username = ? LIMIT 1`
+	query := `SELECT cash, stockTrades FROM books WHERE username = $1 LIMIT 1`
 	err := db.QueryRow(query, username).Scan(&user.Cash, &user.StockTrades)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -474,7 +486,7 @@ func calculateNetworth(db *sql.DB, username string) (float64, error) {
 	networth = math.Round(networth*100) / 100
 
 	// Update the networth in the database
-	_, err = db.Exec("UPDATE books SET networth = ? WHERE username = ?", networth, username)
+	_, err = db.Exec("UPDATE books SET networth = $1 WHERE username = $2", networth, username)
 	if err != nil {
 		return 0, fmt.Errorf("failed to update networth: %v", err)
 	}
@@ -488,7 +500,7 @@ func setPurchases(db *sql.DB, username string, itemName string, quantity int) (*
 	var currentPurchases sql.NullString
 	var updatedUser User
 
-	query := `SELECT purchases FROM books WHERE username = ? LIMIT 1`
+	query := `SELECT purchases FROM books WHERE username = $1 LIMIT 1`
 	err := db.QueryRow(query, username).Scan(&currentPurchases)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -507,13 +519,13 @@ func setPurchases(db *sql.DB, username string, itemName string, quantity int) (*
 	}
 
 	// Update the purchases value in the database
-	_, err = db.Exec("UPDATE books SET purchases = ? WHERE username = ?", updatedPurchases, username)
+	_, err = db.Exec("UPDATE books SET purchases = $1 WHERE username = $2", updatedPurchases, username)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update purchases: %v", err)
 	}
 
 	// Retrieve the updated user
-	err = db.QueryRow("SELECT id, name, username, purchases FROM books WHERE username = ?", username).Scan(&updatedUser.ID, &updatedUser.Name, &updatedUser.Username, &updatedUser.Purchases)
+	err = db.QueryRow("SELECT id, name, username, purchases FROM books WHERE username = $1", username).Scan(&updatedUser.ID, &updatedUser.Name, &updatedUser.Username, &updatedUser.Purchases)
 	if err != nil {
 		return nil, fmt.Errorf("error retrieving updated user: %v", err)
 	}
@@ -526,7 +538,7 @@ func getPurchases(db *sql.DB, username string) ([]string, []int, error) {
 	// First, retrieve the current purchases value
 	var currentPurchases sql.NullString
 
-	query := `SELECT purchases FROM books WHERE username = ? LIMIT 1`
+	query := `SELECT purchases FROM books WHERE username = $1 LIMIT 1`
 	err := db.QueryRow(query, username).Scan(&currentPurchases)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -572,7 +584,7 @@ func getPurchases(db *sql.DB, username string) ([]string, []int, error) {
 // clearPurchases removes all entries in the purchases column for the given username
 func clearPurchases(db *sql.DB, username string) (*User, error) {
 	// Update the purchases column to an empty string for the specified user
-	query := `UPDATE books SET purchases = '' WHERE username = ?`
+	query := `UPDATE books SET purchases = '' WHERE username = $1`
 	_, err := db.Exec(query, username)
 	if err != nil {
 		return nil, fmt.Errorf("failed to clear purchases: %v", err)
@@ -580,7 +592,7 @@ func clearPurchases(db *sql.DB, username string) (*User, error) {
 
 	// Retrieve the updated user to return
 	var updatedUser User
-	err = db.QueryRow("SELECT id, name, username, purchases FROM books WHERE username = ?", username).Scan(&updatedUser.ID, &updatedUser.Name, &updatedUser.Username, &updatedUser.Purchases)
+	err = db.QueryRow("SELECT id, name, username, purchases FROM books WHERE username = $1", username).Scan(&updatedUser.ID, &updatedUser.Name, &updatedUser.Username, &updatedUser.Purchases)
 	if err != nil {
 		return nil, fmt.Errorf("error retrieving updated user: %v", err)
 	}

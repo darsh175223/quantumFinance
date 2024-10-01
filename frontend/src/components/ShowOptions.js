@@ -168,7 +168,7 @@ const ShowOptions = () => {
           onClick={() => setIsOpen(!isOpen)}
           style={buttonStyle}
         >
-          Show Options In Use
+          Show Options In Use 
         </button>
         {isOpen && (
           <div ref={dropdownRef} style={dropdownStyle}>
