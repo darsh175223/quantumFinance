@@ -7,7 +7,7 @@ import (
 	"github.com/gin-contrib/cors"
 	// "github.com/sirupsen/logrus"
 	// "time"
-	// "os"
+	"os"
 	"strconv"
 )
 
@@ -913,5 +913,11 @@ func main() {
 	router.PATCH("/setNetworth",updateNetworth )
 
 
-	router.Run("localhost:8080")
+	port := os.Getenv("PORT")
+    if port == "" {
+        port = "8080" // Default port if not specified
+    }
+
+    // Bind to 0.0.0.0 with the specified port
+    router.Run("0.0.0.0:" + port)
 }
