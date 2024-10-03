@@ -867,7 +867,7 @@ func main() {
     router.Use(cors.Default())
 
 	// Use the logging middleware
-	router.Use(LogMiddleware)
+	// router.Use(LogMiddleware)
 
 	router.GET("/users", getUsers)
 	router.GET("/users/:id", getUserbyID)
