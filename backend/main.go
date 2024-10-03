@@ -488,11 +488,11 @@ func addCoveredCall(c *gin.Context) {
 	userHistory, err := updateCoveredCall(db, username, concatenatedString);
 	if err != nil {
 		// If the operation fails, return a 404 Not Found status
-		fmt.Println(err)
+		fmt.Println("err: ",err)
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "addCoveredCall not excecuted correctly"})
 		return
 	}
-
+	fmt.Println(userHistory)
 	// Return the updated user history as a JSON response with a 200 OK status
 	c.IndentedJSON(http.StatusOK, userHistory)
 }
@@ -757,8 +757,8 @@ func addIronButterfly(c *gin.Context) {
 	userHistory, err := updateIronButterfly(db, username, concatenatedString);
 	if err != nil {
 		// If the operation fails, return a 404 Not Found status
-		fmt.Println(err)
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "addLongStraddle not excecuted correctly"})
+		fmt.Println("Err:",err)
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": " not excecuted correctly"})
 		return
 	}
 
