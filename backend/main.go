@@ -5,61 +5,61 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
-	"github.com/sirupsen/logrus"
-	"time"
-	"os"
+	// "github.com/sirupsen/logrus"
+	// "time"
+	// "os"
 	"strconv"
 )
 
-// Initialize the logger
-var log = logrus.New()
+// // Initialize the logger
+// var log = logrus.New()
 
-// LogMiddleware logs the details of every request
-func LogMiddleware(c *gin.Context) {
-	startTime := time.Now()
+// // LogMiddleware logs the details of every request
+// func LogMiddleware(c *gin.Context) {
+// 	startTime := time.Now()
 
-	// Process request
-	c.Next()
+// 	// Process request
+// 	c.Next()
 
-	// Log the request details
-	endTime := time.Now()
-	latency := endTime.Sub(startTime)
+// 	// Log the request details
+// 	endTime := time.Now()
+// 	latency := endTime.Sub(startTime)
 
-	// Status code, method, path, latency, client IP, and user agent
-	statusCode := c.Writer.Status()
-	clientIP := c.ClientIP()
-	method := c.Request.Method
-	path := c.Request.URL.Path
-	userAgent := c.Request.UserAgent()
+// 	// Status code, method, path, latency, client IP, and user agent
+// 	statusCode := c.Writer.Status()
+// 	clientIP := c.ClientIP()
+// 	method := c.Request.Method
+// 	path := c.Request.URL.Path
+// 	userAgent := c.Request.UserAgent()
 
-	log.WithFields(logrus.Fields{
-		"statusCode": statusCode,
-		"latency":    latency,
-		"clientIP":   clientIP,
-		"method":     method,
-		"path":       path,
-		"userAgent":  userAgent,
-	}).Info("Request logged")
-}
+// 	log.WithFields(logrus.Fields{
+// 		"statusCode": statusCode,
+// 		"latency":    latency,
+// 		"clientIP":   clientIP,
+// 		"method":     method,
+// 		"path":       path,
+// 		"userAgent":  userAgent,
+// 	}).Info("Request logged")
+// }
 
-func init() {
-	// Open a file for logging
-	logFile, err := os.OpenFile("./security/Qfinance.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		log.Fatal("Could not open log file", err)
-	}
+// func init() {
+// 	// Open a file for logging
+// 	logFile, err := os.OpenFile("./security/Qfinance.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+// 	if err != nil {
+// 		log.Fatal("Could not open log file", err)
+// 	}
 
-	// Set the output of the logger to the file
-	log.Out = logFile
+// 	// Set the output of the logger to the file
+// 	log.Out = logFile
 
-	// Optionally, set the log level (optional)
-	log.SetLevel(logrus.InfoLevel)
+// 	// Optionally, set the log level (optional)
+// 	log.SetLevel(logrus.InfoLevel)
 
-	// Set log format (optional)
-	log.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp: true,
-	})
-}
+// 	// Set log format (optional)
+// 	log.SetFormatter(&logrus.TextFormatter{
+// 		FullTimestamp: true,
+// 	})
+// }
 
 
 // Function to retrieve all users from the database
