@@ -34,21 +34,27 @@ type userOptions struct {
 	Reversal     string `json:"reversal"`
 }
 
-// Function to update the coveredCall value for a specific username
+// Function to update or insert the coveredCall value for a specific username
 func updateCoveredCall(db *sql.DB, username string, newCoveredCall string) (string, error) {
     var coveredCall sql.NullString
-    query := "SELECT coveredCall FROM optionStrategies WHERE username = ?"
-    
-    // Retrieve the current coveredCall value
+    query := "SELECT coveredCall FROM optionStrategies WHERE username = $1"
+
+    // Check if the user already has a coveredCall value
     err := db.QueryRow(query, username).Scan(&coveredCall)
     if err != nil {
         if err == sql.ErrNoRows {
-            return "", fmt.Errorf("no rows found for username: %s", username)
+            // No existing coveredCall, so insert a new row
+            insertQuery := "INSERT INTO optionStrategies (username, coveredCall) VALUES ($1, $2)"
+            _, err := db.Exec(insertQuery, username, newCoveredCall)
+            if err != nil {
+                return "", fmt.Errorf("failed to insert new coveredCall: %v", err)
+            }
+            return newCoveredCall, nil
         }
-        return "", err
+        return "", fmt.Errorf("failed to retrieve current coveredCall: %v", err)
     }
 
-    // If the coveredCall value is NULL, use newCoveredCall as the first entry
+    // If the coveredCall value exists, concatenate the new one
     var updatedCoveredCall string
     if coveredCall.Valid {
         updatedCoveredCall = coveredCall.String + newCoveredCall
@@ -57,335 +63,386 @@ func updateCoveredCall(db *sql.DB, username string, newCoveredCall string) (stri
     }
 
     // Update the coveredCall column with the concatenated string
-    updateQuery := "UPDATE optionStrategies SET coveredCall = ? WHERE username = ?"
+    updateQuery := "UPDATE optionStrategies SET coveredCall = $1 WHERE username = $2"
     _, err = db.Exec(updateQuery, updatedCoveredCall, username)
     if err != nil {
-        return "",err
+        return "", fmt.Errorf("failed to update coveredCall: %v", err)
     }
 
     return updatedCoveredCall, nil
 }
 
-// Function to update the coveredCall value for a specific username
-func updateMarriedPut(db *sql.DB, username string, newCoveredCall string) (string, error) {
-    var coveredCall sql.NullString
-    query := "SELECT MarriedPut FROM optionStrategies WHERE username = ?"
-    
-    // Retrieve the current coveredCall value
-    err := db.QueryRow(query, username).Scan(&coveredCall)
+
+
+// Function to update or insert the MarriedPut value for a specific username
+func updateMarriedPut(db *sql.DB, username string, newMarriedPut string) (string, error) {
+    var marriedPut sql.NullString
+    query := "SELECT MarriedPut FROM optionStrategies WHERE username = $1"
+
+    // Check if the user already has a MarriedPut value
+    err := db.QueryRow(query, username).Scan(&marriedPut)
     if err != nil {
         if err == sql.ErrNoRows {
-            return "", fmt.Errorf("no rows found for username: %s", username)
+            // No existing MarriedPut, so insert a new row
+            insertQuery := "INSERT INTO optionStrategies (username, MarriedPut) VALUES ($1, $2)"
+            _, err := db.Exec(insertQuery, username, newMarriedPut)
+            if err != nil {
+                return "", fmt.Errorf("failed to insert new MarriedPut: %v", err)
+            }
+            return newMarriedPut, nil
+        }
+        return "", fmt.Errorf("failed to retrieve current MarriedPut: %v", err)
+    }
+
+    // If the MarriedPut value exists, concatenate the new one
+    var updatedMarriedPut string
+    if marriedPut.Valid {
+        updatedMarriedPut = marriedPut.String + ", " + newMarriedPut
+    } else {
+        updatedMarriedPut = newMarriedPut
+    }
+
+    // Update the MarriedPut column with the concatenated string
+    updateQuery := "UPDATE optionStrategies SET MarriedPut = $1 WHERE username = $2"
+    _, err = db.Exec(updateQuery, updatedMarriedPut, username)
+    if err != nil {
+        return "", fmt.Errorf("failed to update MarriedPut: %v", err)
+    }
+
+    return updatedMarriedPut, nil
+}
+
+
+func updateBullCallSpread(db *sql.DB, username string, newBullCallSpread string) (string, error) {
+    var bullCallSpread sql.NullString
+    query := "SELECT BullCallSpread FROM optionStrategies WHERE username = $1"
+    
+    err := db.QueryRow(query, username).Scan(&bullCallSpread)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            insertQuery := "INSERT INTO optionStrategies (username, BullCallSpread) VALUES ($1, $2)"
+            _, err = db.Exec(insertQuery, username, newBullCallSpread)
+            if err != nil {
+                return "", err
+            }
+            return newBullCallSpread, nil
         }
         return "", err
     }
 
-    // If the coveredCall value is NULL, use newCoveredCall as the first entry
-    var updatedCoveredCall string
-    if coveredCall.Valid {
-        updatedCoveredCall = coveredCall.String + newCoveredCall
+    var updatedBullCallSpread string
+    if bullCallSpread.Valid {
+        updatedBullCallSpread = bullCallSpread.String + newBullCallSpread
     } else {
-        updatedCoveredCall = newCoveredCall
+        updatedBullCallSpread = newBullCallSpread
     }
 
-    // Update the coveredCall column with the concatenated string
-    updateQuery := "UPDATE optionStrategies SET MarriedPut  = ? WHERE username = ?"
-    _, err = db.Exec(updateQuery, updatedCoveredCall, username)
+    updateQuery := "UPDATE optionStrategies SET BullCallSpread = $1 WHERE username = $2"
+    _, err = db.Exec(updateQuery, updatedBullCallSpread, username)
     if err != nil {
-        return "",err
+        return "", err
     }
 
-    return updatedCoveredCall, nil
+    return updatedBullCallSpread, nil
 }
 
-
-func updateBullCallSpread(db *sql.DB, username string, newCoveredCall string) (string, error) {
-	//Parameters of bull call spread is symbol, strike price of bought call, strike price of sold call (Make it higher than the bought call)
-    var coveredCall sql.NullString
-    query := "SELECT BullCallSpread  FROM optionStrategies WHERE username = ?"
+func updateBearPutSpread(db *sql.DB, username string, newBearPutSpread string) (string, error) {
+    var bearPutSpread sql.NullString
+    query := "SELECT BearPutSpread FROM optionStrategies WHERE username = $1"
     
-    // Retrieve the current coveredCall value
-    err := db.QueryRow(query, username).Scan(&coveredCall)
+    err := db.QueryRow(query, username).Scan(&bearPutSpread)
     if err != nil {
         if err == sql.ErrNoRows {
-            return "", fmt.Errorf("no rows found for username: %s", username)
+            insertQuery := "INSERT INTO optionStrategies (username, BearPutSpread) VALUES ($1, $2)"
+            _, err = db.Exec(insertQuery, username, newBearPutSpread)
+            if err != nil {
+                return "", err
+            }
+            return newBearPutSpread, nil
         }
         return "", err
     }
 
-    // If the coveredCall value is NULL, use newCoveredCall as the first entry
-    var updatedCoveredCall string
-    if coveredCall.Valid {
-        updatedCoveredCall = coveredCall.String + newCoveredCall
+    var updatedBearPutSpread string
+    if bearPutSpread.Valid {
+        updatedBearPutSpread = bearPutSpread.String + newBearPutSpread
     } else {
-        updatedCoveredCall = newCoveredCall
+        updatedBearPutSpread = newBearPutSpread
     }
 
-    // Update the coveredCall column with the concatenated string
-    updateQuery := "UPDATE optionStrategies SET bullCallSpread  = ? WHERE username = ?"
-    _, err = db.Exec(updateQuery, updatedCoveredCall, username)
+    updateQuery := "UPDATE optionStrategies SET BearPutSpread = $1 WHERE username = $2"
+    _, err = db.Exec(updateQuery, updatedBearPutSpread, username)
     if err != nil {
-        return "",err
+        return "", err
     }
 
-    return updatedCoveredCall, nil
+    return updatedBearPutSpread, nil
 }
 
-func updateBearPutSpread(db *sql.DB, username string, newCoveredCall string) (string, error) {
-	//Parameters of bull call spread is symbol, strike price of bought call, strike price of sold call (Make it higher than the bought call)
-    var coveredCall sql.NullString
-    query := "SELECT BearPutSpread FROM optionStrategies WHERE username = ?"
+func updateProtectiveCollar(db *sql.DB, username string, newProtectiveCollar string) (string, error) {
+    var protectiveCollar sql.NullString
+    query := "SELECT ProtectiveCollar FROM optionStrategies WHERE username = $1"
     
-    // Retrieve the current coveredCall value
-    err := db.QueryRow(query, username).Scan(&coveredCall)
+    err := db.QueryRow(query, username).Scan(&protectiveCollar)
     if err != nil {
         if err == sql.ErrNoRows {
-            return "", fmt.Errorf("no rows found for username: %s", username)
+            insertQuery := "INSERT INTO optionStrategies (username, ProtectiveCollar) VALUES ($1, $2)"
+            _, err = db.Exec(insertQuery, username, newProtectiveCollar)
+            if err != nil {
+                return "", err
+            }
+            return newProtectiveCollar, nil
         }
         return "", err
     }
 
-    // If the coveredCall value is NULL, use newCoveredCall as the first entry
-    var updatedCoveredCall string
-    if coveredCall.Valid {
-        updatedCoveredCall = coveredCall.String + newCoveredCall
+    var updatedProtectiveCollar string
+    if protectiveCollar.Valid {
+        updatedProtectiveCollar = protectiveCollar.String + newProtectiveCollar
     } else {
-        updatedCoveredCall = newCoveredCall
+        updatedProtectiveCollar = newProtectiveCollar
     }
 
-    // Update the coveredCall column with the concatenated string
-    updateQuery := "UPDATE optionStrategies SET bearPutSpread   = ? WHERE username = ?"
-    _, err = db.Exec(updateQuery, updatedCoveredCall, username)
+    updateQuery := "UPDATE optionStrategies SET ProtectiveCollar = $1 WHERE username = $2"
+    _, err = db.Exec(updateQuery, updatedProtectiveCollar, username)
     if err != nil {
-        return "",err
+        return "", err
     }
 
-    return updatedCoveredCall, nil
+    return updatedProtectiveCollar, nil
 }
 
-func updateProtectiveCollar(db *sql.DB, username string, newCoveredCall string) (string, error) {
-	//Parameters of bull call spread is symbol, strike price of bought call, strike price of sold call (Make it higher than the bought call)
-    var coveredCall sql.NullString
-    query := "SELECT ProtectiveCollar FROM optionStrategies WHERE username = ?"
+func updateLongStraddle(db *sql.DB, username string, newLongStraddle string) (string, error) {
+    var longStraddle sql.NullString
+    query := "SELECT LongStraddle FROM optionStrategies WHERE username = $1"
     
-    // Retrieve the current coveredCall value
-    err := db.QueryRow(query, username).Scan(&coveredCall)
+    err := db.QueryRow(query, username).Scan(&longStraddle)
     if err != nil {
         if err == sql.ErrNoRows {
-            return "", fmt.Errorf("no rows found for username: %s", username)
+            insertQuery := "INSERT INTO optionStrategies (username, LongStraddle) VALUES ($1, $2)"
+            _, err = db.Exec(insertQuery, username, newLongStraddle)
+            if err != nil {
+                return "", err
+            }
+            return newLongStraddle, nil
         }
         return "", err
     }
 
-    // If the coveredCall value is NULL, use newCoveredCall as the first entry
-    var updatedCoveredCall string
-    if coveredCall.Valid {
-        updatedCoveredCall = coveredCall.String + newCoveredCall
+    var updatedLongStraddle string
+    if longStraddle.Valid {
+        updatedLongStraddle = longStraddle.String + newLongStraddle
     } else {
-        updatedCoveredCall = newCoveredCall
+        updatedLongStraddle = newLongStraddle
     }
 
-    // Update the coveredCall column with the concatenated string
-    updateQuery := "UPDATE optionStrategies SET protectiveCollar = ? WHERE username = ?"
-    _, err = db.Exec(updateQuery, updatedCoveredCall, username)
+    updateQuery := "UPDATE optionStrategies SET LongStraddle = $1 WHERE username = $2"
+    _, err = db.Exec(updateQuery, updatedLongStraddle, username)
     if err != nil {
-        return "",err
+        return "", err
     }
 
-    return updatedCoveredCall, nil
+    return updatedLongStraddle, nil
 }
 
-func updateLongStraddle(db *sql.DB, username string, newCoveredCall string) (string, error) {
-	//Parameters of bull call spread is symbol, strike price of bought call, strike price of sold call (Make it higher than the bought call)
-    var coveredCall sql.NullString
-    query := "SELECT LongStraddle FROM optionStrategies WHERE username = ?"
+func updateLongStrangle(db *sql.DB, username string, newLongStrangle string) (string, error) {
+    var longStrangle sql.NullString
+    query := "SELECT LongStrangle FROM optionStrategies WHERE username = $1"
     
-    // Retrieve the current coveredCall value
-    err := db.QueryRow(query, username).Scan(&coveredCall)
+    err := db.QueryRow(query, username).Scan(&longStrangle)
     if err != nil {
         if err == sql.ErrNoRows {
-            return "", fmt.Errorf("no rows found for username: %s", username)
+            insertQuery := "INSERT INTO optionStrategies (username, LongStrangle) VALUES ($1, $2)"
+            _, err = db.Exec(insertQuery, username, newLongStrangle)
+            if err != nil {
+                return "", err
+            }
+            return newLongStrangle, nil
         }
         return "", err
     }
 
-    // If the coveredCall value is NULL, use newCoveredCall as the first entry
-    var updatedCoveredCall string
-    if coveredCall.Valid {
-        updatedCoveredCall = coveredCall.String + newCoveredCall
+    var updatedLongStrangle string
+    if longStrangle.Valid {
+        updatedLongStrangle = longStrangle.String + newLongStrangle
     } else {
-        updatedCoveredCall = newCoveredCall
+        updatedLongStrangle = newLongStrangle
     }
 
-    // Update the coveredCall column with the concatenated string
-    updateQuery := "UPDATE optionStrategies SET longStraddle = ? WHERE username = ?"
-    _, err = db.Exec(updateQuery, updatedCoveredCall, username)
+    updateQuery := "UPDATE optionStrategies SET LongStrangle = $1 WHERE username = $2"
+    _, err = db.Exec(updateQuery, updatedLongStrangle, username)
     if err != nil {
-        return "",err
+        return "", err
     }
 
-    return updatedCoveredCall, nil
+    return updatedLongStrangle, nil
 }
 
-func updateLongStrangle(db *sql.DB, username string, newCoveredCall string) (string, error) {
-	//Parameters of bull call spread is symbol, strike price of bought call, strike price of sold call (Make it higher than the bought call)
-    var coveredCall sql.NullString
-    query := "SELECT LongStrangle FROM optionStrategies WHERE username = ?"
+func updateLongCallButterflySpread(db *sql.DB, username string, newLongCallButterflySpread string) (string, error) {
+    var longCallButterflySpread sql.NullString
+    query := "SELECT LongCallButterflySpread FROM optionStrategies WHERE username = $1"
     
-    // Retrieve the current coveredCall value
-    err := db.QueryRow(query, username).Scan(&coveredCall)
+    err := db.QueryRow(query, username).Scan(&longCallButterflySpread)
     if err != nil {
         if err == sql.ErrNoRows {
-            return "", fmt.Errorf("no rows found for username: %s", username)
+            insertQuery := "INSERT INTO optionStrategies (username, LongCallButterflySpread) VALUES ($1, $2)"
+            _, err = db.Exec(insertQuery, username, newLongCallButterflySpread)
+            if err != nil {
+                return "", err
+            }
+            return newLongCallButterflySpread, nil
         }
         return "", err
     }
 
-    // If the coveredCall value is NULL, use newCoveredCall as the first entry
-    var updatedCoveredCall string
-    if coveredCall.Valid {
-        updatedCoveredCall = coveredCall.String + newCoveredCall
+    var updatedLongCallButterflySpread string
+    if longCallButterflySpread.Valid {
+        updatedLongCallButterflySpread = longCallButterflySpread.String + newLongCallButterflySpread
     } else {
-        updatedCoveredCall = newCoveredCall
+        updatedLongCallButterflySpread = newLongCallButterflySpread
     }
 
-    // Update the coveredCall column with the concatenated string
-    updateQuery := "UPDATE optionStrategies SET longStrangle = ? WHERE username = ?"
-    _, err = db.Exec(updateQuery, updatedCoveredCall, username)
+    updateQuery := "UPDATE optionStrategies SET LongCallButterflySpread = $1 WHERE username = $2"
+    _, err = db.Exec(updateQuery, updatedLongCallButterflySpread, username)
     if err != nil {
-        return "",err
+        return "", err
     }
 
-    return updatedCoveredCall, nil
+    return updatedLongCallButterflySpread, nil
 }
 
-func updateLongCallButterflySpread(db *sql.DB, username string, newCoveredCall string) (string, error) {
-	//Parameters of bull call spread is symbol, strike price of bought call, strike price of sold call (Make it higher than the bought call)
-    var coveredCall sql.NullString
-    query := "SELECT LongCallButterflySpread FROM optionStrategies WHERE username = ?"
+func updateIronCondor(db *sql.DB, username string, newIronCondor string) (string, error) {
+    var ironCondor sql.NullString
+    query := "SELECT IronCondor FROM optionStrategies WHERE username = $1"
     
-    // Retrieve the current coveredCall value
-    err := db.QueryRow(query, username).Scan(&coveredCall)
+    err := db.QueryRow(query, username).Scan(&ironCondor)
     if err != nil {
         if err == sql.ErrNoRows {
-            return "", fmt.Errorf("no rows found for username: %s", username)
+            insertQuery := "INSERT INTO optionStrategies (username, IronCondor) VALUES ($1, $2)"
+            _, err = db.Exec(insertQuery, username, newIronCondor)
+            if err != nil {
+                return "", err
+            }
+            return newIronCondor, nil
         }
         return "", err
     }
 
-    // If the coveredCall value is NULL, use newCoveredCall as the first entry
-    var updatedCoveredCall string
-    if coveredCall.Valid {
-        updatedCoveredCall = coveredCall.String + newCoveredCall
+    var updatedIronCondor string
+    if ironCondor.Valid {
+        updatedIronCondor = ironCondor.String + newIronCondor
     } else {
-        updatedCoveredCall = newCoveredCall
+        updatedIronCondor = newIronCondor
     }
 
-    // Update the coveredCall column with the concatenated string
-    updateQuery := "UPDATE optionStrategies SET longCallButterflySpread = ? WHERE username = ?"
-    _, err = db.Exec(updateQuery, updatedCoveredCall, username)
+    updateQuery := "UPDATE optionStrategies SET IronCondor = $1 WHERE username = $2"
+    _, err = db.Exec(updateQuery, updatedIronCondor, username)
     if err != nil {
-        return "",err
+        return "", err
     }
 
-    return updatedCoveredCall, nil
+    return updatedIronCondor, nil
 }
 
-func updateIronCondor(db *sql.DB, username string, newCoveredCall string) (string, error) {
-	//Parameters of bull call spread is symbol, strike price of bought call, strike price of sold call (Make it higher than the bought call)
-    var coveredCall sql.NullString
-    query := "SELECT IronCondor FROM optionStrategies WHERE username = ?"
+func updateIronButterfly(db *sql.DB, username string, newIronButterfly string) (string, error) {
+    var ironButterfly sql.NullString
+    query := "SELECT IronButterfly FROM optionStrategies WHERE username = $1"
     
-    // Retrieve the current coveredCall value
-    err := db.QueryRow(query, username).Scan(&coveredCall)
+    err := db.QueryRow(query, username).Scan(&ironButterfly)
     if err != nil {
         if err == sql.ErrNoRows {
-            return "", fmt.Errorf("no rows found for username: %s", username)
+            insertQuery := "INSERT INTO optionStrategies (username, IronButterfly) VALUES ($1, $2)"
+            _, err = db.Exec(insertQuery, username, newIronButterfly)
+            if err != nil {
+                return "", err
+            }
+            return newIronButterfly, nil
         }
         return "", err
     }
 
-    // If the coveredCall value is NULL, use newCoveredCall as the first entry
-    var updatedCoveredCall string
-    if coveredCall.Valid {
-        updatedCoveredCall = coveredCall.String + newCoveredCall
+    var updatedIronButterfly string
+    if ironButterfly.Valid {
+        updatedIronButterfly = ironButterfly.String + newIronButterfly
     } else {
-        updatedCoveredCall = newCoveredCall
+        updatedIronButterfly = newIronButterfly
     }
 
-    // Update the coveredCall column with the concatenated string
-    updateQuery := "UPDATE optionStrategies SET ironCondor = ? WHERE username = ?"
-    _, err = db.Exec(updateQuery, updatedCoveredCall, username)
+    updateQuery := "UPDATE optionStrategies SET IronButterfly = $1 WHERE username = $2"
+    _, err = db.Exec(updateQuery, updatedIronButterfly, username)
     if err != nil {
-        return "",err
+        return "", err
     }
 
-    return updatedCoveredCall, nil
+    return updatedIronButterfly, nil
 }
 
-func updateIronButterfly(db *sql.DB, username string, newCoveredCall string) (string, error) {
-	//Parameters of bull call spread is symbol, strike price of bought call, strike price of sold call (Make it higher than the bought call)
-    var coveredCall sql.NullString
-    query := "SELECT IronButterfly FROM optionStrategies WHERE username = ?"
+func updateConversion(db *sql.DB, username string, newConversion string) (string, error) {
+    var conversion sql.NullString
+    query := "SELECT Conversion FROM optionStrategies WHERE username = $1"
     
-    // Retrieve the current coveredCall value
-    err := db.QueryRow(query, username).Scan(&coveredCall)
+    err := db.QueryRow(query, username).Scan(&conversion)
     if err != nil {
         if err == sql.ErrNoRows {
-            return "", fmt.Errorf("no rows found for username: %s", username)
+            insertQuery := "INSERT INTO optionStrategies (username, Conversion) VALUES ($1, $2)"
+            _, err = db.Exec(insertQuery, username, newConversion)
+            if err != nil {
+                return "", err
+            }
+            return newConversion, nil
         }
         return "", err
     }
 
-    // If the coveredCall value is NULL, use newCoveredCall as the first entry
-    var updatedCoveredCall string
-    if coveredCall.Valid {
-        updatedCoveredCall = coveredCall.String + newCoveredCall
+    var updatedConversion string
+    if conversion.Valid {
+        updatedConversion = conversion.String + newConversion
     } else {
-        updatedCoveredCall = newCoveredCall
+        updatedConversion = newConversion
     }
 
-    // Update the coveredCall column with the concatenated string
-    updateQuery := "UPDATE optionStrategies SET ironButterfly = ? WHERE username = ?"
-    _, err = db.Exec(updateQuery, updatedCoveredCall, username)
+    updateQuery := "UPDATE optionStrategies SET Conversion = $1 WHERE username = $2"
+    _, err = db.Exec(updateQuery, updatedConversion, username)
     if err != nil {
-        return "",err
+        return "", err
     }
 
-    return updatedCoveredCall, nil
+    return updatedConversion, nil
 }
 
-func updateReversal(db *sql.DB, username string, newCoveredCall string) (string, error) {
-	//Parameters of bull call spread is symbol, strike price of bought call, strike price of sold call (Make it higher than the bought call)
-    var coveredCall sql.NullString
-    query := "SELECT Reversal FROM optionStrategies WHERE username = ?"
+func updateReversal(db *sql.DB, username string, newReversal string) (string, error) {
+    var reversal sql.NullString
+    query := "SELECT Reversal FROM optionStrategies WHERE username = $1"
     
-    // Retrieve the current coveredCall value
-    err := db.QueryRow(query, username).Scan(&coveredCall)
+    err := db.QueryRow(query, username).Scan(&reversal)
     if err != nil {
         if err == sql.ErrNoRows {
-            return "", fmt.Errorf("no rows found for username: %s", username)
+            insertQuery := "INSERT INTO optionStrategies (username, Reversal) VALUES ($1, $2)"
+            _, err = db.Exec(insertQuery, username, newReversal)
+            if err != nil {
+                return "", err
+            }
+            return newReversal, nil
         }
         return "", err
     }
 
-    // If the coveredCall value is NULL, use newCoveredCall as the first entry
-    var updatedCoveredCall string
-    if coveredCall.Valid {
-        updatedCoveredCall = coveredCall.String + newCoveredCall
+    var updatedReversal string
+    if reversal.Valid {
+        updatedReversal = reversal.String + newReversal
     } else {
-        updatedCoveredCall = newCoveredCall
+        updatedReversal = newReversal
     }
 
-    // Update the coveredCall column with the concatenated string
-    updateQuery := "UPDATE optionStrategies SET reversal = ? WHERE username = ?"
-    _, err = db.Exec(updateQuery, updatedCoveredCall, username)
+    updateQuery := "UPDATE optionStrategies SET Reversal = $1 WHERE username = $2"
+    _, err = db.Exec(updateQuery, updatedReversal, username)
     if err != nil {
-        return "",err
+        return "", err
     }
 
-    return updatedCoveredCall, nil
+    return updatedReversal, nil
 }
+
 
 func returnProfit(db *sql.DB, username string) (int, error) {
     profit := 0
@@ -1274,7 +1331,7 @@ func getNonNullColumns(db *sql.DB, username string) ([]string, error) {
 			LongStraddle, LongStrangle, LongCallButterflySpread, IronCondor, IronButterfly,
 			Conversion, Reversal
 		FROM optionStrategies
-		WHERE username = ?`
+		WHERE username = $1`
 	
 	// Retrieve the row
 	row := db.QueryRow(query, username)
